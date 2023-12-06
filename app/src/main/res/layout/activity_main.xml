@@ -4,53 +4,62 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="15dp"
-    tools:context=".MainActivity">
-
+    android:layout_margin="0dp"
+    tools:context=".MainActivity"
+    android:background="#9966DFFD"
+    tools:ignore="ExtraText">
 
     <TextView
         android:id="@+id/tv_Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="20sp"
+        android:fontFamily="@font/bungee_shade"
         android:text="RacoonSquash"
-        android:textSize="30sp"
+        android:textColor="#070E3E"
+        android:textSize="35sp"
         app:layout_constraintBottom_toTopOf="@+id/tv_Intro"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/tv_Intro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tjenare hoppsan här är lite text som finns o existerar och är där och så"
-        android:textSize="14sp"
+        android:layout_margin="20sp"
+        android:fontFamily="@font/sansita_bold"
         android:gravity="center"
+        android:text="Are you ready to challange yourself? "
+        android:textColor="#070E3E"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/et_playername"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.508"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.291" />
+        app:layout_constraintVertical_bias="0.393" />
 
     <EditText
         android:id="@+id/et_playername"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginBottom="24dp"
-        android:hint="Ange SpelarNamn här"
+        android:hint="Please type in your username:"
         app:layout_constraintBottom_toTopOf="@+id/spinner_highscore"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btn_pong"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_width="143dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="36dp"
         android:text="RacoonPong"
+        android:backgroundTint="#091553"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.063"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_Intro" />
 
@@ -58,10 +67,10 @@
         android:id="@+id/btn_squash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="100dp"
         android:text="RacoonSquash"
+        android:backgroundTint="#091553"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_Intro" />
 
@@ -69,7 +78,7 @@
         android:id="@+id/spinner_highscore"
         android:layout_width="250dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="288dp"
+        android:layout_marginBottom="188dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
