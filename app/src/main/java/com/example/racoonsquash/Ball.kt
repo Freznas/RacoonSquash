@@ -15,7 +15,8 @@ open class Ball(
     var size: Float,
     var speedX: Float,
     var speedY: Float,
-    var color: Int
+    var color: Int,
+    var speed : Float
 ) {
     var paint = Paint()
 
