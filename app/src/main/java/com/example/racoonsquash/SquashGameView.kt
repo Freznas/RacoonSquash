@@ -7,14 +7,10 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.PathMeasure
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.icu.text.Transliterator
 import android.view.MotionEvent
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     private var thread: Thread? = null
