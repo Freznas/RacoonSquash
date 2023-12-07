@@ -65,9 +65,7 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
     }
 
     private fun setup() {
- Joakim_B
         ball1 = Ball(this.context, 100f, 100f, 30f, 25f, 7f, Color.RED, 25f)
- master
         val drawablePaddle = resources.getDrawable(R.drawable.player_pad, null)
         squashPad = SquashPad(
             this.context, 50f, 400f, 6f, 0f, 0f, 0,
