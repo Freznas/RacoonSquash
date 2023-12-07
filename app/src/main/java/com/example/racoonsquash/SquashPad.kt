@@ -33,7 +33,7 @@ class SquashPad(
     var drawable: Drawable? = null
 
     init {
-        drawable = context.resources.getDrawable(R.drawable.player_pad, null)
+        drawable = context.resources.getDrawable(R.drawable.player_pad_a, null)
 
     }
 

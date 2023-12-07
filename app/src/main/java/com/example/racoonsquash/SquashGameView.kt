@@ -7,10 +7,13 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PathMeasure
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.icu.text.Transliterator
+import android.util.Log
 import android.view.MotionEvent
+import android.widget.Button
 
 class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     private var thread: Thread? = null
@@ -18,8 +21,6 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
     lateinit var canvas: Canvas
     lateinit var ball1: Ball
     lateinit var squashPad: SquashPad
-    lateinit var posX: Transliterator.Position
-    lateinit var posY: Transliterator.Position
     private var lineColor: Paint
     private var touchColor: Paint
     private var scorePaint: Paint
@@ -65,11 +66,13 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
     }
 
     private fun setup() {
-        ball1 = Ball(this.context, 100f, 100f, 30f, 25f, 7f, Color.RED, 25f)
-        val drawablePaddle = resources.getDrawable(R.drawable.player_pad, null)
+
+        ball1 = Ball(this.context, 100f, 100f, 30f, 20f, 20f, Color.RED, 20f)
+
+        val drawablePaddle = resources.getDrawable(R.drawable.player_pad_a, null)
         squashPad = SquashPad(
             this.context, 50f, 400f, 6f, 0f, 0f, 0,
-            4f, 75f, 0f
+            15f, 75f, 0f
         )
     }
 
@@ -79,6 +82,7 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
             Thread(this) //en trad har en konstruktor som tar in en runnable,
         // vilket sker i denna klass se rad 10
         thread?.start()
+
     }
 
     fun stop() {
@@ -109,13 +113,24 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
         val vY = event?.y.toString()
         squashPad.posY = event!!.y
         return true
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+
+            }
+        }
+        return true
         // return super.onTouchEvent(event)
     }
 
-    //onBallCollision inverterar riktningen på bollen när den träffar squashPad
+// denna funktionen beräknar avstånd från bollens Y position och padelns Y position för att
+// bestämma vart på padeln som bollen träffar.
+// sen bestäms studsriktningen beroende på vart på padeln kollisionen sker
+// sen så räknas vinkeln genom multiplicera normaliserade värdet.
+//
+
     fun onBallCollision(ball1: Ball, squashPad: SquashPad) {
-        ball1.speedY *= -1
-        ball1.speedX *= -1
+//        ball1.speedY *= -1
+//        ball1.speedX *= -1
         val relativeIntersectY = squashPad.posY - ball1.posY
         val normalizedIntersectY = (relativeIntersectY / (squashPad.height / 2)).coerceIn(-1f, 1f)
         val bounceAngle =
@@ -125,8 +140,7 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
         ball1.speedY = (-ball1.speed * Math.sin(bounceAngle)).toFloat()
     }
 
-    // här tar vi in storlek från ball och squashPad och kontrollerar när en kollision
-// sker och kallar onBallCollision
+    // här tar vi in storlek från ball och squashPad och kontrollerar när en kollision sker
     fun ballIntersects(ball1: Ball, squashPad: SquashPad) {
         val padLeft = squashPad.posX - squashPad.width
         val padRight = squashPad.posX + squashPad.width
@@ -201,7 +215,12 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
 
             } else {
                 // Placera text
-                canvas?.drawText("Score: $score", canvas.width.toFloat() - 400, 0f + 100, scorePaint)
+                canvas?.drawText(
+                    "Score: $score",
+                    canvas.width.toFloat() - 400,
+                    0f + 100,
+                    scorePaint
+                )
             }
         }
 
