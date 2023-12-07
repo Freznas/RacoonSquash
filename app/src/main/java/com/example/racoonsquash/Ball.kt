@@ -4,9 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import java.lang.Math.abs
-import kotlin.math.pow
-import kotlin.math.sqrt
+
 
 open class Ball(
     context: Context,
@@ -15,7 +13,8 @@ open class Ball(
     var size: Float,
     var speedX: Float,
     var speedY: Float,
-    var color: Int
+    color: Int,
+    var speed: Float
 ) {
     var paint = Paint()
 
@@ -27,7 +26,7 @@ open class Ball(
         // Kolla vänster och höger vägg
         if (posX + size > bounds.right) {
             speedX *= -1
-           if (posX + size > bounds.right) {
+            if (posX + size > bounds.right) {
                 posX = bounds.right - size
             }
         }

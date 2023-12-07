@@ -8,9 +8,12 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.icu.text.Transliterator
+import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.widget.Button
+
 
 class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     private var thread: Thread? = null
@@ -18,8 +21,6 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
     lateinit var canvas: Canvas
     lateinit var ball1: Ball
     lateinit var squashPad: SquashPad
-    lateinit var posX: Transliterator.Position
-    lateinit var posY: Transliterator.Position
     private var lineColor: Paint
     private var touchColor: Paint
     private var scorePaint: Paint
@@ -79,11 +80,13 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
     }
 
     private fun setup() {
-        ball1 = Ball(this.context, 100f, 100f, 30f, 20f, 7f, Color.RED)
-        val drawablePaddle = resources.getDrawable(R.drawable.player_pad, null)
+
+        ball1 = Ball(this.context, 100f, 100f, 30f, 20f, 20f, Color.RED, 20f)
+
+        val drawablePaddle = resources.getDrawable(R.drawable.player_pad_a, null)
         squashPad = SquashPad(
             this.context, 50f, 400f, 6f, 0f, 0f, 0,
-            4f, 75f
+            15f, 75f, 0f
         )
     }
 
@@ -93,6 +96,7 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
             Thread(this) //en trad har en konstruktor som tar in en runnable,
         // vilket sker i denna klass se rad 10
         thread?.start()
+
     }
 
     fun stop() {
@@ -117,7 +121,7 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
 
     //med denna kod kan jag rora pa boll2 som star stilla annars
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event != null) {
+         if (event != null) {
             val x = event.x.toInt()
             val y = event.y.toInt()
             if (!isInsidePauseRectangule(x, y)) {
@@ -137,20 +141,30 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
 
     private fun isInsidePauseRectangule(x: Int, y: Int) = buttonPauseRect!!.contains(x, y)
 
-    //onBallCollision inverterar riktningen på bollen när den träffar squashPad
+//onBallCollision inverterar riktningen på bollen när den träffar squashPad
+// denna funktionen beräknar avstånd från bollens Y position och padelns Y position för att
+// bestämma vart på padeln som bollen träffar.
+// sen bestäms studsriktningen beroende på vart på padeln kollisionen sker
+// sen så räknas vinkeln genom multiplicera normaliserade värdet.
+//
     fun onBallCollision(ball1: Ball, squashPad: SquashPad) {
-        ball1.speedY *= -1
-        ball1.speedX *= -1
+//        ball1.speedY *= -1
+//        ball1.speedX *= -1
+        val relativeIntersectY = squashPad.posY - ball1.posY
+        val normalizedIntersectY = (relativeIntersectY / (squashPad.height / 2)).coerceIn(-1f, 1f)
+        val bounceAngle =
+            normalizedIntersectY * Math.PI / 7
+
+        ball1.speedX = (ball1.speed * Math.cos(bounceAngle)).toFloat()
+        ball1.speedY = (-ball1.speed * Math.sin(bounceAngle)).toFloat()
     }
 
-    // här tar vi in storlek från ball och squashPad och kontrollerar när en kollision
-// sker och kallar onBallCollision
+    // här tar vi in storlek från ball och squashPad och kontrollerar när en kollision sker
     fun ballIntersects(ball1: Ball, squashPad: SquashPad) {
         val padLeft = squashPad.posX - squashPad.width
         val padRight = squashPad.posX + squashPad.width
         val padTop = squashPad.posY - squashPad.height
         val padBottom = squashPad.posY + squashPad.height
-
         val ballLeft = ball1.posX - ball1.size
         val ballRight = ball1.posX + ball1.size
         val ballTop = ball1.posY - ball1.size
@@ -222,7 +236,12 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
 
             } else {
                 // Placera text
-                canvas?.drawText("Score: $score", canvas.width.toFloat() - 400, 0f + 100, scorePaint)
+                canvas?.drawText(
+                    "Score: $score",
+                    canvas.width.toFloat() - 400,
+                    0f + 100,
+                    scorePaint
+                )
             }
         }
 

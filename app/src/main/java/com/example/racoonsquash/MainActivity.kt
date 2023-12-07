@@ -5,7 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import com.example.racoonsquash.databinding.ActivityMainBinding
-
+//RacoonGames
+// Medlemmar:Jörgen Hård (ProductOwner), Joakim Bjärkstedt (scrum-Master) Elin Andersson(utvecklare) Denise Cigel (Utvecklare)
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding

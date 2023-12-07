@@ -1,12 +1,8 @@
 package com.example.racoonsquash
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
-import android.view.MotionEvent
-import android.view.View
 
 class SquashPad(
 
@@ -18,8 +14,9 @@ class SquashPad(
     speedY: Float,
     color: Int,
     val width: Float,
-    val height:Float
-) : Ball(context, posX, posY, size, speedX, speedY, color) {
+    val height: Float,
+    speed: Float
+) : Ball(context, posX, posY, size, speedX, speedY, color, speed) {
 
 
     var left: Float = posX - size
@@ -36,7 +33,7 @@ class SquashPad(
     var drawable: Drawable? = null
 
     init {
-        drawable = context.resources.getDrawable(R.drawable.player_pad, null)
+        drawable = context.resources.getDrawable(R.drawable.player_pad_a, null)
 
     }
 
