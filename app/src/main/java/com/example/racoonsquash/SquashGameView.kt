@@ -3,17 +3,17 @@ package com.example.racoonsquash
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.PathMeasure
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.icu.text.Transliterator
 import android.util.Log
 import android.view.MotionEvent
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.widget.Button
+
 
 class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     private var thread: Thread? = null
@@ -26,12 +26,26 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
     private var scorePaint: Paint
     private var textGameOverPaint: Paint
     private var score: Int = 0;
+    private var isPaused = false
 
     //Path-klass ritar ett "spår" från en punkt moveTo() till nästa punkt lineTo()
     private var gameBoundaryPath: Path? = null
 
     var bounds = Rect() //for att kunna studsa m vaggarna
     var mHolder: SurfaceHolder? = holder
+
+    private var buttonPauseRect :Rect? = null
+    private val buttonPausePaint = Paint().apply {
+        //This could be transparent if no rectangle is wanted to be shown
+        color = Color.YELLOW
+        alpha = 100
+    }
+    private val buttonPauseTextPaint = Paint().apply {
+        color = Color.WHITE
+        textSize = 60.0F
+        typeface = Typeface.create("serif-monospace", Typeface.BOLD)
+    }
+    private var buttonPauseText = context.getString(R.string.pauseText)
 
     init {
         if (mHolder != null) {
@@ -107,27 +121,32 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
 
     //med denna kod kan jag rora pa boll2 som star stilla annars
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        val vX =
-            event?.x.toString() //ett sätt att hantera att en vill ha null och en nonnull
-        // versioner av datatyperna
-        val vY = event?.y.toString()
-        squashPad.posY = event!!.y
-        return true
-        when (event?.action) {
-            MotionEvent.ACTION_DOWN -> {
-
+         if (event != null) {
+            val x = event.x.toInt()
+            val y = event.y.toInt()
+            if (!isInsidePauseRectangule(x, y)) {
+                // User is not clicking on pause
+                squashPad.posY = event.y // Move pad
+            } else if (isInsidePauseRectangule(x, y) && event.action == MotionEvent.ACTION_DOWN) {
+                // User is clicking on Pause
+                buttonPauseText = if (isPaused) context.getString(R.string.pauseText)
+                                    else context.getString(R.string.resumeText)
+                isPaused = !isPaused
+                drawGameBounds(holder)
             }
+            return true
         }
-        return true
-        // return super.onTouchEvent(event)
+        return super.onTouchEvent(event)
     }
 
+    private fun isInsidePauseRectangule(x: Int, y: Int) = buttonPauseRect!!.contains(x, y)
+
+//onBallCollision inverterar riktningen på bollen när den träffar squashPad
 // denna funktionen beräknar avstånd från bollens Y position och padelns Y position för att
 // bestämma vart på padeln som bollen träffar.
 // sen bestäms studsriktningen beroende på vart på padeln kollisionen sker
 // sen så räknas vinkeln genom multiplicera normaliserade värdet.
 //
-
     fun onBallCollision(ball1: Ball, squashPad: SquashPad) {
 //        ball1.speedY *= -1
 //        ball1.speedX *= -1
@@ -182,12 +201,14 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
 
     //run/metoden ar en metod som vi fick fran interface Runnable och ar kopplat till dess Thread.
     // Run anropas nar vi kor Thread.start()
-    //den kor en while loop med var running variable pch anropar update och draw:
+    //den kor en while loop med vår running variable och anropar update och draw:
     override fun run() {
         while (running) {
-            update()
-            drawGameBounds(holder)
-            ball1.checkBounds(bounds)
+            if(!isPaused) {
+                update()
+                drawGameBounds(holder)
+                ball1.checkBounds(bounds)
+            }
         }
     }
 
@@ -226,6 +247,25 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
 
         ball1.draw(canvas)
         squashPad.draw(canvas)
+
+        //Draw pause button
+        if (canvas != null) {
+            val buttonPauseTextLength = buttonPauseTextPaint.measureText(buttonPauseText)
+            buttonPauseRect = Rect(
+                (canvas.width.toFloat() - 650f).toInt(),
+                0 + 50,
+                (canvas.width.toFloat() - 650f + buttonPauseTextLength + 10).toInt(),
+                50 + textGameOverPaint.textSize.toInt()
+            ) // x-start, y-start, x-end, y-end
+
+            canvas.drawRect(buttonPauseRect!!, buttonPausePaint)
+            canvas.drawText(
+                buttonPauseText,
+                buttonPauseRect!!.left.toFloat() + 5,
+                buttonPauseRect!!.top.toFloat() + buttonPauseTextPaint.textSize - 10,
+                buttonPauseTextPaint
+            )
+        }
         holder.unlockCanvasAndPost(canvas)
     }
 
