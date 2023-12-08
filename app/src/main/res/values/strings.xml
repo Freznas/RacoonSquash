@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">RacoonSquash</string>
+    <string name="pauseText">Pause</string>
+    <string name="resumeText">Resume</string>
 </resources>
