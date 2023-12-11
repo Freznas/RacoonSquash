@@ -15,4 +15,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "RacoonSquash"
 include(":app")
+
  
