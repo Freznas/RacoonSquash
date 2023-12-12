@@ -22,6 +22,7 @@ class PongActivity : AppCompatActivity() {
         binding = ActivityPongBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val surfaceHolder = binding.svPong.holder
         val gameView = PongGameView(this)
         val container = binding.root
         container.addView(gameView)

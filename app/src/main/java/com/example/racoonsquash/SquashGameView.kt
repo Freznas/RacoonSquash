@@ -7,12 +7,9 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
-import android.icu.text.Transliterator
-import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.widget.Button
 
 
 class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
@@ -176,14 +173,6 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
             onBallCollision(ball1, squashPad)
         }
     }
-    /*    fun draw() {
-            canvas = holder!!.lockCanvas()
-            canvas.drawColor(Color.BLUE)
-
-
-            holder!!.unlockCanvasAndPost(canvas)
-        }*/
-
     //dessa startar och stoppar min thread:
     override fun surfaceCreated(holder: SurfaceHolder) {
         // start()
