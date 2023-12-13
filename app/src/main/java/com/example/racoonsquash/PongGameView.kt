@@ -13,6 +13,9 @@ class PongGameView (context: Context) : SurfaceView(context), SurfaceHolder.Call
     private var lineColor: Paint
     private var leftBoundaryPath: Path? = null
     private var rightBoundaryPath: Path? = null
+    private val blockList: MutableList<BreakoutBlock> = mutableListOf()
+    private val xPositionList: MutableList<Float> = mutableListOf()
+    private val yPositionList: MutableList<Float> = mutableListOf()
 
     var mHolder: SurfaceHolder? = holder
 
@@ -28,7 +31,50 @@ class PongGameView (context: Context) : SurfaceView(context), SurfaceHolder.Call
         }
     }
 
+    private fun rowBlockPlacement(xPosition: Float) {
+        xPositionList.add(xPosition)
+    }
+
+    private fun columnBlockPlacement(yPosition: Float) {
+        yPositionList.add(yPosition)
+    }
+
+    private fun addBlockInList(block: BreakoutBlock) {
+        blockList.add(block)
+    }
+
+    // Adding blocks in list the specified coordinates
+    private fun buildBreakoutBlocks() {
+        val colors: List<Int> = listOf(Color.GREEN, Color.RED, Color.CYAN, Color.RED, Color.GREEN)
+        var newColor = colors.indexOf(Color.GREEN)
+
+        for (y in yPositionList) {
+            for (x in xPositionList) {
+                addBlockInList(BreakoutBlock(x, y, x+180f, y+50f, colors[newColor]))
+            }
+            newColor+=1
+        }
+    }
+
     override fun surfaceCreated(holder: SurfaceHolder) {
+        val centerY = height/2-25f
+        val centerX = width/2-80f
+
+        // Blocks x-coordinates (Column-placement)
+        rowBlockPlacement(centerX-400f)
+        rowBlockPlacement(centerX-200f)
+        rowBlockPlacement(centerX)
+        rowBlockPlacement(centerX+200f)
+        rowBlockPlacement(centerX+400f)
+
+        // Blocks y-coordinates (Row-placement)
+        columnBlockPlacement(centerY-140f)
+        columnBlockPlacement(centerY-70f)
+        columnBlockPlacement(centerY)
+        columnBlockPlacement(centerY+70f)
+        columnBlockPlacement(centerY+140f)
+
+        buildBreakoutBlocks()
 
     }
 
@@ -58,6 +104,10 @@ class PongGameView (context: Context) : SurfaceView(context), SurfaceHolder.Call
 
         leftBoundaryPath?.let {
             canvas?.drawPath(it, lineColor)
+        }
+        // Draw all blocks in blockList
+        for (block in blockList) {
+            block.draw(canvas)
         }
 
         holder.unlockCanvasAndPost(canvas)
