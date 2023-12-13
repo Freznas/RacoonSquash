@@ -47,10 +47,12 @@ class PongGameView (context: Context) : SurfaceView(context), SurfaceHolder.Call
     private fun buildBreakoutBlocks() {
         val colors: List<Int> = listOf(Color.GREEN, Color.RED, Color.CYAN, Color.RED, Color.GREEN)
         var newColor = colors.indexOf(Color.GREEN)
+        val blockWidth = 180f
+        val blockHeight = 50f
 
         for (y in yPositionList) {
             for (x in xPositionList) {
-                addBlockInList(BreakoutBlock(x, y, x+180f, y+50f, colors[newColor]))
+                addBlockInList(BreakoutBlock(x, y, x+blockWidth, y+blockHeight, colors[newColor]))
             }
             newColor+=1
         }
