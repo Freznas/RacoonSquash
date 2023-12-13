@@ -16,7 +16,7 @@ class SquashPad(
     val width: Float,
     val height: Float,
     speed: Float
-) : Ball(context, posX, posY, size, speedX, speedY, color, speed) {
+) : BallSquash(context, posX, posY, size, speedX, speedY, color, speed) {
 
 
     var left: Float = posX - size
