@@ -87,7 +87,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         blockList.add(block)
     }
 
-    // Adding blocks in list the specified coordinates
+    // Adding blocks in list in rows and columns
     private fun buildBreakoutBlocks() {
         val colors: List<Int> = listOf(Color.GREEN, Color.BLUE, Color.CYAN, Color.BLUE, Color.GREEN)
         var newColor = colors.indexOf(Color.GREEN)
@@ -103,8 +103,10 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        val centerY = height/2-25f
-        val centerX = width/2-90f
+        val blockWidth = 180f
+        val blockHeight = 50f
+        val centerX = (width/2)-(blockWidth/2)
+        val centerY = (height/2)-(blockHeight/2)
 
         // Blocks row-placement
         rowBlockPlacement(centerX-400f)
@@ -132,7 +134,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     }
 
-
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         stop()
     }
@@ -151,6 +152,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             canvas?.drawPath(it, lineColor)
         }
 
+        //Draw all blocks
         for (block in blockList) {
             block.draw(canvas)
         }
@@ -179,6 +181,4 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         return pathRight
     }
-
-
 }
