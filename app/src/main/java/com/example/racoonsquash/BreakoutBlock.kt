@@ -27,5 +27,6 @@ class BreakoutBlock(
 
         canvas?.drawRect(posX, posY, width, height, paint)
         canvas?.drawRect(posX, posY, width, height, stroke)
+        
     }
 }
