@@ -12,10 +12,9 @@ import android.view.SurfaceView
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
     var running = false
-    lateinit var canvas: Canvas
-    var lineColor: Paint
-    var leftBoundaryPath: Path? = null
-    var rightBoundaryPath: Path? = null
+    private var lineColor: Paint
+    private var leftBoundaryPath: Path? = null
+    private var rightBoundaryPath: Path? = null
 
     private val blockList: MutableList<BreakoutBlock> = mutableListOf()
     private val xPositionList: MutableList<Float> = mutableListOf()
@@ -40,18 +39,14 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
 
     private fun setup() {
-
-
         ballPong = BallPong(context, 100f, 100f, 15f, 20f, 20f, Color.RED)
 
     }
 
     fun start() {
         running = true
-
         thread = Thread(this) //en trad har en konstruktor som tar in en runnable,
         // vilket sker i denna klass se rad 10
-
         thread?.start()
 
     }
@@ -59,16 +54,15 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     fun stop() {
         running = false
         thread?.join()
-//        try {
-//            thread?.join() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
-//        } catch (e: InterruptedException) {
-//            e.printStackTrace()
-//        }
+        try {
+            thread?.join() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
     }
 
     fun update() {
         ballPong.update()
-
 
     }
 
@@ -135,8 +129,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         rightBoundaryPath = createBoundaryPathRight(width, height)
         bounds = Rect(0, 0, width, height)
         start()
-        drawGameBounds(holder)
-
 
     }
 
