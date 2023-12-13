@@ -58,7 +58,7 @@ class PongGameView (context: Context) : SurfaceView(context), SurfaceHolder.Call
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         val centerY = height/2-25f
-        val centerX = width/2-80f
+        val centerX = width/2-90f
 
         // Blocks x-coordinates (Column-placement)
         rowBlockPlacement(centerX-400f)
