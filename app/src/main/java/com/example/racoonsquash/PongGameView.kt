@@ -60,14 +60,14 @@ class PongGameView (context: Context) : SurfaceView(context), SurfaceHolder.Call
         val centerY = height/2-25f
         val centerX = width/2-90f
 
-        // Blocks x-coordinates (Column-placement)
+        // Blocks row-placement
         rowBlockPlacement(centerX-400f)
         rowBlockPlacement(centerX-200f)
         rowBlockPlacement(centerX)
         rowBlockPlacement(centerX+200f)
         rowBlockPlacement(centerX+400f)
 
-        // Blocks y-coordinates (Row-placement)
+        // Blocks column-placement
         columnBlockPlacement(centerY-140f)
         columnBlockPlacement(centerY-70f)
         columnBlockPlacement(centerY)
