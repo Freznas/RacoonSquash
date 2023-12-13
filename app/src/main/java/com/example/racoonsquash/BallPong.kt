@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 
 
-open class Ball(
+open class BallPong(
     context: Context,
     var posX: Float,
     var posY: Float,
@@ -14,8 +14,8 @@ open class Ball(
     var speedX: Float,
     var speedY: Float,
     color: Int,
-    var speed: Float
-) {
+
+    ) {
     var paint = Paint()
 
     init {
@@ -24,9 +24,11 @@ open class Ball(
 
     fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
-        if (posX + size > bounds.right) {
+        if (posX - size < bounds.left || posX + size > bounds.right) {
             speedX *= -1
-            if (posX + size > bounds.right) {
+            if (posX - size < bounds.left) {
+                posX = bounds.left + size
+            } else if (posX + size > bounds.right) {
                 posX = bounds.right - size
             }
         }
@@ -42,9 +44,8 @@ open class Ball(
         }
     }
 
-    fun update() {
-        //posY = posY + speed // bollar som aker nerat pa vanster sidan
-        //posX += speed //diagonalt akande bollar
+    open fun update() {
+
         posX += speedX
         posY += speedY
 

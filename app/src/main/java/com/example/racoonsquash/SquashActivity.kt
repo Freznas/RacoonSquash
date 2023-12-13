@@ -16,7 +16,7 @@ class SquashActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
-        val surfaceHolder = binding.surfaceView.holder
+        val surfaceHolder = binding.svSquash.holder
         val gameView = SquashGameView(this)
         val container = binding.root
         container.addView(gameView)
