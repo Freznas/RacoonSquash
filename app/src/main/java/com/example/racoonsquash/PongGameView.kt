@@ -8,6 +8,8 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -89,16 +91,15 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     // Adding blocks in list in rows and columns
     private fun buildBreakoutBlocks() {
-        val colors: List<Int> = listOf(Color.GREEN, Color.BLUE, Color.CYAN, Color.BLUE, Color.GREEN)
-        var newColor = colors.indexOf(Color.GREEN)
+        var randomBitmap = Random.nextInt(0, 3)
         val blockWidth = 180f
         val blockHeight = 50f
 
         for (y in yPositionList) {
             for (x in xPositionList) {
-                addBlockInList(BreakoutBlock(x, y, x+blockWidth, y+blockHeight, colors[newColor]))
+                addBlockInList(BreakoutBlock(this.context, x, y, x+blockWidth, y+blockHeight, randomBitmap))
+                randomBitmap = Random.nextInt(0, 3)
             }
-            newColor+=1
         }
     }
 
@@ -137,7 +138,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         stop()
     }
-
 
     fun drawGameBounds(holder: SurfaceHolder) {
         val canvas: Canvas? = holder.lockCanvas()
