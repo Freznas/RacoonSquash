@@ -16,7 +16,6 @@ import android.view.SurfaceView
 class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     private var thread: Thread? = null
     private var running = false
-    lateinit var canvas: Canvas
     lateinit var ballSquash: BallSquash
     lateinit var squashPad: SquashPad
     private var lineColor: Paint
@@ -84,7 +83,7 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
 
         ballSquash = BallSquash(this.context, 100f, 100f, 30f, 20f, 20f, Color.RED, 20f)
 
-        val drawablePaddle = resources.getDrawable(R.drawable.player_pad_a, null)
+       // val drawablePaddle = resources.getDrawable(R.drawable.player_pad_a, null)
         squashPad = SquashPad(
             this.context, 50f, 400f, 6f, 0f, 0f, 0,
             15f, 75f, 0f
@@ -188,7 +187,6 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
     }
     //dessa startar och stoppar min thread:
     override fun surfaceCreated(holder: SurfaceHolder) {
-         start()
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
