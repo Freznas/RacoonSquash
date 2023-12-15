@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="0dp"
-    tools:context=".MainActivity"
     android:background="#9967D4EF"
+    tools:context=".MainActivity"
     tools:ignore="ExtraText">
 
     <TextView
@@ -37,29 +37,31 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/et_playername"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintHorizontal_bias="0.704"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.393" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <EditText
         android:id="@+id/et_playername"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginBottom="24dp"
+        android:layout_width="296dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="172dp"
         android:hint="Please type in your username:"
-        app:layout_constraintBottom_toTopOf="@+id/spinner_highscore"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <Button
         android:id="@+id/btn_pong"
         android:layout_width="143dp"
         android:layout_height="51dp"
-        android:layout_marginTop="36dp"
-        android:text="RacoonPong"
+        android:layout_marginTop="200dp"
         android:backgroundTint="#091553"
+        android:text="RacoonPong"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_Intro" />
 
@@ -67,19 +69,35 @@
         android:id="@+id/btn_squash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="RacoonSquash"
+        android:layout_marginTop="132dp"
         android:backgroundTint="#091553"
+        android:text="RacoonSquash"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_Intro" />
 
-    <Spinner
-        android:id="@+id/spinner_highscore"
-        android:layout_width="250dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="188dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_pong">
+
+        <ExpandableListView
+            android:id="@+id/expandableListView"
+            android:layout_width="208dp"
+            android:layout_height="353dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.493"
+            app:layout_constraintStart_toStartOf="parent">
+
+        </ExpandableListView>
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
