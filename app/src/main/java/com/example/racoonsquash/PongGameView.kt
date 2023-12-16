@@ -8,8 +8,9 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import kotlin.math.pow
+import kotlin.math.sqrt
 import kotlin.random.Random
-import kotlin.random.nextInt
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -65,7 +66,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     fun update() {
         ballPong.update()
-
+        checkBlockBallCollision()
     }
 
     override fun run() {
@@ -77,28 +78,72 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         }
     }
 
-    private fun rowBlockPlacement(xPosition: Float) {
+    private fun columnBlockPlacement(xPosition: Float) {
         xPositionList.add(xPosition)
     }
 
-    private fun columnBlockPlacement(yPosition: Float) {
+    private fun rowBlockPlacement(yPosition: Float) {
         yPositionList.add(yPosition)
+
     }
 
     private fun addBlockInList(block: BreakoutBlock) {
         blockList.add(block)
     }
 
+    private fun deleteBlockInList(block: BreakoutBlock) {
+        blockList.remove(block)
+    }
+
     // Adding blocks in list in rows and columns
     private fun buildBreakoutBlocks() {
         var randomBitmap = Random.nextInt(0, 3)
-        val blockWidth = 180f
+        val blockWidth = 175f
         val blockHeight = 50f
 
         for (y in yPositionList) {
             for (x in xPositionList) {
-                addBlockInList(BreakoutBlock(this.context, x, y, x+blockWidth, y+blockHeight, randomBitmap))
+                addBlockInList(
+                    BreakoutBlock(
+                        this.context, x, y, x + blockWidth, y + blockHeight,
+                        randomBitmap
+                    )
+                )
                 randomBitmap = Random.nextInt(0, 3)
+            }
+        }
+    }
+    private fun onBlockCollision(block: BreakoutBlock, ball: BallPong): Boolean {
+        // BlockX blir den närmsta punkten på breakout-blocket x/width mot bollens x-position
+        val blockX = if (ball.posX < block.posX) {
+            block.posX
+        } else if (ball.posX > block.width) {
+            block.width
+        } else {
+            ball.posX
+        }
+
+        // BlockY blir den näsrmsta punkten på breakout-blockets y/height mot bollens y-position
+        val blockY = if (ball.posY < block.posY) {
+            block.posY
+        } else if (ball.posY > block.height) {
+            block.height
+        } else {
+            ball.posY
+        }
+        // Räkna avståndet mellan bollens och blockets X och Y med pythagoras sats och dra bort bollens size.
+        val distance =
+            sqrt((ball.posX - blockX).toDouble().pow(2.0) + (ball.posY - blockY).toDouble().pow(2.0))
+
+        return distance < ball.size
+    }
+
+    private fun checkBlockBallCollision() {
+        for (block in blockList) {
+            if (onBlockCollision(block, ballPong)) {
+                ballPong.speedY *= -1
+                deleteBlockInList(block)
+                break
             }
         }
     }
@@ -106,22 +151,22 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     override fun surfaceCreated(holder: SurfaceHolder) {
         val blockWidth = 180f
         val blockHeight = 50f
-        val centerX = (width/2)-(blockWidth/2)
-        val centerY = (height/2)-(blockHeight/2)
-
-        // Blocks row-placement
-        rowBlockPlacement(centerX-400f)
-        rowBlockPlacement(centerX-200f)
-        rowBlockPlacement(centerX)
-        rowBlockPlacement(centerX+200f)
-        rowBlockPlacement(centerX+400f)
+        val centerX = (width / 2) - (blockWidth / 2)
+        val centerY = (height / 2) - (blockHeight / 2)
 
         // Blocks column-placement
-        columnBlockPlacement(centerY-140f)
-        columnBlockPlacement(centerY-70f)
-        columnBlockPlacement(centerY)
-        columnBlockPlacement(centerY+70f)
-        columnBlockPlacement(centerY+140f)
+        columnBlockPlacement(centerX - 400f)
+        columnBlockPlacement(centerX - 200f)
+        columnBlockPlacement(centerX)
+        columnBlockPlacement(centerX + 200f)
+        columnBlockPlacement(centerX + 400f)
+
+        // Blocks row-placement
+        rowBlockPlacement(centerY - 140f)
+        rowBlockPlacement(centerY - 70f)
+        rowBlockPlacement(centerY)
+        rowBlockPlacement(centerY + 70f)
+        rowBlockPlacement(centerY + 140f)
 
         buildBreakoutBlocks()
 
