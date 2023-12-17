@@ -45,7 +45,7 @@ class SquashPad(
                 (posX + it.intrinsicWidth / 2).toInt(),
                 (posY + it.intrinsicHeight / 2).toInt()
             )
-            it.draw(canvas!!)
+            canvas?.let { it1 -> it.draw(it1) }
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.example.racoonsquash
 
-import android.graphics.Canvas
-import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.racoonsquash.databinding.ActivitySquashBinding
@@ -15,9 +13,8 @@ class SquashActivity : AppCompatActivity() {
         binding = ActivitySquashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         val surfaceHolder = binding.svSquash.holder
-        val gameView = SquashGameView(this)
+        val gameView = SquashGameView(this, intent.getStringExtra("userName")!!)
         val container = binding.root
         container.addView(gameView)
 
