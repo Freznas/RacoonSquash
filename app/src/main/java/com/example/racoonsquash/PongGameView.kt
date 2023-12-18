@@ -30,8 +30,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     lateinit var ballPong: BallPong
     var bounds = Rect()
     var mHolder: SurfaceHolder? = holder
-    private val initialBallPosX = 200f
-    private val initialBallPosY = 400f
+    private val initialBallPosX = 500f
+    private val initialBallPosY = 700f
 
     init {
         if (mHolder != null) {
@@ -112,7 +112,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             scorePlayerTop = 0
 
         }
-        if (scorePlayerBottom >= 10 || scorePlayerTop >= 10) {
+        if (scorePlayerBottom >= 11 || scorePlayerTop >= 11) {
 
             try {
                 Thread.sleep(5000)
@@ -283,7 +283,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                 canvas?.drawText(
                     "GAME OVER",
                     canvas.width.toFloat() / 3,
-                    canvas.height.toFloat() / 2,
+                    canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
         }
@@ -312,8 +312,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             if (scorePlayerTop >= 10)
                 canvas?.drawText(
                     "GAME OVER",
-                    canvas.width.toFloat() / 4,
-                    canvas.height.toFloat() / 2,
+                    canvas.width.toFloat() / 3,
+                    canvas.height.toFloat() / 4,
                     textGameOverPaint
                 )
 
