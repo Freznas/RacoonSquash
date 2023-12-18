@@ -110,6 +110,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         }
     }
 
+
     override fun run() {
         while (running) {
             update()
