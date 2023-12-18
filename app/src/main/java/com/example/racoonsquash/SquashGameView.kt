@@ -13,7 +13,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 
 
-class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
+class SquashGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     private var thread: Thread? = null
     private var running = false
     lateinit var ballSquash: BallSquash
@@ -114,17 +114,19 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
         // Räknar bara när boll rör långsidan just nu
         if (ballSquash.posX > width - ballSquash.size) {
             updateScore()
-        } else if (ballSquash.posX < 0) {
-            score = 0
         }
     }
 
     override fun run() {
         while (running) {
-            if(!isPaused) {
-                update()
-                drawGameBounds(holder)
-                ballSquash.checkBounds(bounds)
+            if (!isPaused) {
+                try {
+                    update()
+                    drawGameBounds(holder)
+                    ballSquash.checkBounds(bounds)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
@@ -211,7 +213,9 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
         gameBoundaryPath?.let {
             canvas?.drawPath(it, lineColor)
 
-            if (ballSquash.posX < 0 - ballSquash.size) {
+            if (isGameOver()) {
+                //user loses
+
                 canvas?.drawPath(it, touchColor)
                 canvas?.drawText(
                     "Score: $score",
@@ -226,6 +230,9 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
                     textGameOverPaint
                 )
 
+                // Save score
+                val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
+                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.SQUASH))
             } else {
                 // Placera text
                 canvas?.drawText(
@@ -261,6 +268,8 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
         }
         holder.unlockCanvasAndPost(canvas)
     }
+
+    private fun isGameOver() = ballSquash.posX < 0 - ballSquash.size
 
     // För syns skull gör en Path med färgade linjer för gränserna.
     private fun createBoundaryPath(width: Int, height: Int): Path {

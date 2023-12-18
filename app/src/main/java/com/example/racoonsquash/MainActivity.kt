@@ -2,15 +2,12 @@ package com.example.racoonsquash
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ExpandableListView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.racoonsquash.databinding.ActivityMainBinding
 
 //RacoonGames
 // Medlemmar:Jörgen Hård (ProductOwner), Joakim Bjärkstedt (scrum-Master) Elin Andersson(utvecklare) Denise Cigel (Utvecklare)
 class MainActivity : AppCompatActivity() {
-    private lateinit var expandableListView: ExpandableListView
     private lateinit var listAdapter: TopScoreExpandableListAdapter
     private lateinit var gameList: MutableList<String>
     private lateinit var topScorePerGame: HashMap<String, List<DataManager.Score>>
@@ -22,37 +19,31 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val btnpong: Button = findViewById(R.id.btn_pong)
-        val btnsquash: Button = findViewById(R.id.btn_squash)
-
-        dataManager = InMemoryDataManager()
-
-        btnpong.setOnClickListener {
+        binding.btnPong.setOnClickListener {
             val intent = Intent(this, PongActivity::class.java)
+            intent.putExtra("userName", binding.etPlayername.text.toString())
             startActivity(intent)
         }
-        btnsquash.setOnClickListener {
+        binding.btnSquash.setOnClickListener {
             val intent = Intent(this, SquashActivity::class.java)
+            intent.putExtra("userName", binding.etPlayername.text.toString())
             startActivity(intent)
         }
 
-        // Initialisera ExpandableListView
-        expandableListView = findViewById(R.id.expandableListView)
-
-        // Förbered och sätt datan
+        dataManager = SharedPreferencesManager(this)
         loadTopScores()
+
         listAdapter = TopScoreExpandableListAdapter(this, gameList, topScorePerGame)
-        expandableListView.setAdapter(listAdapter)
+        binding.expandableListView.setAdapter(listAdapter)
+        setupListeners()
+    }
 
-        // Sätt upp lyssnare för grupp- och barnklick
-        expandableListView.setOnGroupClickListener { parent, v, groupPosition, id ->
-            // Hantera grupp klick händelser här
-            false
+    private fun setupListeners() {
+        binding.expandableListView.setOnGroupClickListener { parent, v, groupPosition, id ->
+            false   // Returnera 'false' för att tillåta standardexpandering/kollaps av gruppen
         }
-
-        expandableListView.setOnChildClickListener { parent, v, groupPosition, childPosition, id ->
-            // Hantera barn klick händelser här
-            false
+        binding.expandableListView.setOnChildClickListener { parent, v, groupPosition, childPosition, id ->
+            true // Returnera 'true' för att indikera att klicket hanterats
         }
     }
 
@@ -65,6 +56,20 @@ class MainActivity : AppCompatActivity() {
         DataManager.Game.values().forEach { game ->
             topScorePerGame[game.name] = dataManager.getAllScores(game)
         }
+        listAdapter = TopScoreExpandableListAdapter(
+            this,
+            gameList,
+            topScorePerGame
+        )
+    }
 
+    override fun onResume() {
+        super.onResume()
+
+        DataManager.Game.values().forEach { game ->
+            topScorePerGame[game.name] = dataManager.getAllScores(game)
+        }
+
+        listAdapter.notifyDataSetChanged()
     }
 }

@@ -12,7 +12,7 @@ import android.widget.TextView
 class TopScoreExpandableListAdapter(
     private val context: Context,
     private val gameList: List<String>,
-    private val scoresPerGame: HashMap<String, List<DataManager.Score>>,
+    private val scoresPerGame: Map<String, List<DataManager.Score>>,
 ) : BaseExpandableListAdapter() {
 
     override fun getChild(groupPosition: Int, childPosition: Int): DataManager.Score {
