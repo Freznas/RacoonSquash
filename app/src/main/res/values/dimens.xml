@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="exp_list_bottom_margin">16dp</dimen>
+    <dimen name="exp_list_height">353dp</dimen>
+    <dimen name="exp_list_width">208dp</dimen>
+    <dimen name="linear_padding">8dp</dimen>
+    <dimen name="btn_squash_margin_top">132dp</dimen>
+    <dimen name="btn_pong_margin_top">200dp</dimen>
+    <dimen name="btn_pong_width">143dp</dimen>
+    <dimen name="edittext_height">52dp</dimen>
+    <dimen name="edittext_width">296dp</dimen>
+    <dimen name="main_challenge_textsize">20sp</dimen>
+    <dimen name="et_playername_margin_top">172dp</dimen>
+    <dimen name="tv_main_challenge_marign">20sp</dimen>
+    <dimen name="tv_title_textsize">35sp</dimen>
+    <dimen name="tv_title_margin">20sp</dimen>
+    <dimen name="tv_list_group_textsize">16sp</dimen>
+    <dimen name="tv_list_item_padding">10dp</dimen>
+    <dimen name="tv_list_item_textsize">16sp</dimen>
+</resources>
