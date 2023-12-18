@@ -17,14 +17,14 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     var thread: Thread? = null
     var running = false
     var lineColor: Paint
-    var leftBoundaryPath: Path? = null
-    var rightBoundaryPath: Path? = null
+    private var leftBoundaryPath: Path? = null
+    private var rightBoundaryPath: Path? = null
     var touchColor: Paint
     var scorePaint: Paint
     private var textGameOverPaint: Paint
     private var scorePlayerTop = 0
     private var scorePlayerBottom = 0
-    val blockList: MutableList<BreakoutBlock> = mutableListOf()
+    private val blockList: MutableList<BreakoutBlock> = mutableListOf()
     val xPositionList: MutableList<Float> = mutableListOf()
     val yPositionList: MutableList<Float> = mutableListOf()
     lateinit var ballPong: BallPong
@@ -71,7 +71,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
 
     private fun setup() {
-        ballPong = BallPong(context, 100f, 100f, 15f, 20f, 20f, Color.RED)
+        ballPong = CustomPongBall(context, 100f, 100f, 30f, 20f, 20f, 0)
 
     }
 
@@ -197,9 +197,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         }
         // Räkna avståndet mellan bollens och blockets X och Y med pythagoras sats och dra bort bollens size.
         val distance =
-            sqrt(
-                (ball.posX - blockX).toDouble().pow(2.0) + (ball.posY - blockY).toDouble().pow(2.0)
-            )
+            sqrt((ball.posX - blockX).toDouble().pow(2.0) + (ball.posY - blockY).toDouble().pow(2.0))
 
         return distance < ball.size
     }
@@ -235,7 +233,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         rowBlockPlacement(centerY + 140f)
 
         buildBreakoutBlocks()
-
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -257,8 +254,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         rightBoundaryPath?.let {
 
-
-            canvas?.drawPath(it, lineColor)
             canvas?.drawPath(it, lineColor)
             if (ballPong.posY < 0 - ballPong.size) {
                 canvas?.drawPath(it, touchColor)
@@ -290,7 +285,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         leftBoundaryPath?.let {
             canvas?.drawPath(it, lineColor)
-            canvas?.drawPath(it, lineColor)
             if (ballPong.posY < 0 - ballPong.size) {
                 canvas?.drawPath(it, touchColor)
                 canvas?.drawText(
@@ -305,7 +299,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                 canvas?.drawText(
                     "Score: $scorePlayerTop",
                     canvas.width.toFloat() - 400,
-                    0f + 1150,
+                    canvas.height -700f, // Såg ej text i emulator, så ändrade tillfälligt.
                     scorePaint
                 )
             }
