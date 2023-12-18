@@ -45,4 +45,21 @@ class BreakoutBlock(
             2 -> canvas?.drawBitmap(bitmap[2], posX, posY, null)
         }
     }
+
+    fun getPosX(): Float {
+        return posX
+    }
+
+    fun getPosY(): Float {
+        return posY
+    }
+
+    fun getWidth(): Float {
+        return width
+    }
+
+    fun getHeight(): Float {
+        return height
+    }
+
 }

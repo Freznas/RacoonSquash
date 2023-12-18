@@ -14,6 +14,7 @@ open class BallPong(
     var speedX: Float,
     var speedY: Float,
     color: Int,
+    var speed: Float
 
     ) {
     var paint = Paint()
@@ -21,6 +22,7 @@ open class BallPong(
     init {
         paint.color = color
     }
+
 
     fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
