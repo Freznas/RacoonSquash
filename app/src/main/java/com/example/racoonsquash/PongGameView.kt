@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import kotlin.math.pow
@@ -15,13 +16,16 @@ import kotlin.random.Random
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
     var running = false
-    private var lineColor: Paint
-    private var leftBoundaryPath: Path? = null
-    private var rightBoundaryPath: Path? = null
-
-    private val blockList: MutableList<BreakoutBlock> = mutableListOf()
-    private val xPositionList: MutableList<Float> = mutableListOf()
-    private val yPositionList: MutableList<Float> = mutableListOf()
+    var lineColor: Paint
+    var leftBoundaryPath: Path? = null
+    var rightBoundaryPath: Path? = null
+    lateinit var touchColor: Paint
+    lateinit var scorePaint: Paint
+    lateinit var textGameOverPaint: Paint
+    var score: Int = 0;
+    val blockList: MutableList<BreakoutBlock> = mutableListOf()
+    val xPositionList: MutableList<Float> = mutableListOf()
+    val yPositionList: MutableList<Float> = mutableListOf()
 
     lateinit var ballPong: BallPong
     var bounds = Rect()
@@ -37,6 +41,29 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             style = Paint.Style.STROKE
             strokeWidth = 10f
 
+            scorePaint = Paint().apply {
+                color = Color.GREEN
+                alpha = 200
+                textSize = 60.0F
+                typeface = Typeface.create("serif-monospace", Typeface.BOLD)
+            }
+            textGameOverPaint = Paint().apply {
+                color = Color.RED
+                alpha = 200
+                textSize = 60.0F
+                typeface = Typeface.create("serif-monospace", Typeface.BOLD)
+            }
+            // Enbart för att synliggöra gränserna
+            lineColor = Paint().apply {
+                color = Color.MAGENTA
+                style = Paint.Style.STROKE
+                strokeWidth = 10f
+            }
+            touchColor = Paint().apply {
+                color = Color.RED
+                style = Paint.Style.STROKE
+                strokeWidth = 50f
+            }
         }
         setup()
     }
@@ -67,6 +94,20 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     fun update() {
         ballPong.update()
         checkBlockBallCollision()
+        val screenHeight = height // Höjden på skärmen
+
+
+        if (ballPong.posY < -ballPong.size) {
+            updateScoreTop()
+
+            ballPong.posY = screenHeight + ballPong.size // Placera bollen ovanför skärmen
+        }
+        if (ballPong.posY > screenHeight + ballPong.size) {
+            updateScoreBottom()
+            ballPong.posY = +ballPong.size // Placera bollen under skärmen
+        } else if (ballPong.posX < 0) {
+            score = 0
+        }
     }
 
     override fun run() {
@@ -77,6 +118,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         }
     }
+
 
     private fun columnBlockPlacement(xPosition: Float) {
         xPositionList.add(xPosition)
@@ -113,6 +155,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             }
         }
     }
+
     private fun onBlockCollision(block: BreakoutBlock, ball: BallPong): Boolean {
         // BlockX blir den närmsta punkten på breakout-blocket x/width mot bollens x-position
         val blockX = if (ball.posX < block.posX) {
@@ -133,7 +176,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         }
         // Räkna avståndet mellan bollens och blockets X och Y med pythagoras sats och dra bort bollens size.
         val distance =
-            sqrt((ball.posX - blockX).toDouble().pow(2.0) + (ball.posY - blockY).toDouble().pow(2.0))
+            sqrt(
+                (ball.posX - blockX).toDouble().pow(2.0) + (ball.posY - blockY).toDouble().pow(2.0)
+            )
 
         return distance < ball.size
     }
@@ -190,11 +235,64 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         canvas?.drawColor(Color.BLACK)
 
         rightBoundaryPath?.let {
+
+
             canvas?.drawPath(it, lineColor)
+            canvas?.drawPath(it, lineColor)
+            if (ballPong.posY < 0 - ballPong.size) {
+                canvas?.drawPath(it, touchColor)
+                canvas?.drawText(
+                    "Score: $score",
+                    canvas.width.toFloat() - 400,
+                    0f + 100,
+                    textGameOverPaint
+                )
+                canvas?.drawText(
+                    "GAME OVER",
+                    canvas.width.toFloat() / 3,
+                    canvas.height.toFloat() / 2,
+                    textGameOverPaint
+                )
+
+            } else {
+                // Placera text
+                canvas?.drawText(
+                    "Score: $score",
+                    canvas.width.toFloat() - 400,
+                    0f + 100,
+                    scorePaint
+                )
+            }
         }
 
         leftBoundaryPath?.let {
             canvas?.drawPath(it, lineColor)
+            canvas?.drawPath(it, lineColor)
+            if (ballPong.posY < 0 - ballPong.size) {
+                canvas?.drawPath(it, touchColor)
+                canvas?.drawText(
+                    "Score: $score",
+                    canvas.width.toFloat() - 400,
+                    0f + 200,
+                    textGameOverPaint
+                )
+                canvas?.drawText(
+                    "GAME OVER",
+                    canvas.width.toFloat() / 3,
+                    canvas.height.toFloat() / 2,
+                    textGameOverPaint
+                )
+
+            } else {
+                // Placera text
+                canvas?.drawText(
+                    "Score: $score",
+                    canvas.width.toFloat() - 400,
+                    0f + 1150,
+                    scorePaint
+                )
+            }
+
         }
 
         //Draw all blocks
@@ -202,9 +300,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             block.draw(canvas)
         }
 
+
         ballPong.draw(canvas)
         holder.unlockCanvasAndPost(canvas)
-        this.setZOrderOnTop(true)
     }
 
     //     Enbart spelplan med linje för syns skull, vänster sidolinje.
@@ -225,5 +323,15 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         pathRight.lineTo(width.toFloat(), height.toFloat())
 
         return pathRight
+    }
+
+    private fun updateScoreTop(): Int {
+        score++
+        return score
+    }
+
+    private fun updateScoreBottom(): Int {
+        score++
+        return score
     }
 }
