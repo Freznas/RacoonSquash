@@ -31,18 +31,13 @@ open class BallPong(
             } else if (posX + size > bounds.right) {
                 posX = bounds.right - size
             }
+
+
         }
 
-        // Kolla övre och nedre vägg
-        if (posY - size < bounds.top || posY + size > bounds.bottom) {
-            speedY *= -1
-            if (posY - size < bounds.top) {
-                posY = bounds.top + size
-            } else if (posY + size > bounds.bottom) {
-                posY = bounds.bottom - size
-            }
-        }
+
     }
+
 
     open fun update() {
 

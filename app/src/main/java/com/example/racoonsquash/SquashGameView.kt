@@ -237,6 +237,7 @@ class SquashGameView(context: Context) : SurfaceView(context), SurfaceHolder.Cal
             }
         }
 
+
         ballSquash.draw(canvas)
         squashPad.draw(canvas)
 
