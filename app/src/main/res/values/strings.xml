@@ -2,4 +2,12 @@
     <string name="app_name">RacoonSquash</string>
     <string name="pauseText">Pause</string>
     <string name="resumeText">Resume</string>
+    <string name="main_title">RacoonSquash</string>
+    <string name="main_challenge">Are you ready to challenge yourself?</string>
+    <string name="et_playername">Please type in your username:</string>
+    <string name="btn_pong">RacoonPong</string>
+    <string name="btn_squash">RacoonSquash</string>
+    <string name="tv_list_group_header">Game Header</string>
+    <string name="tv_list_item_name">Name</string>
+    <string name="tv_list_item_score">Score</string>
 </resources>
