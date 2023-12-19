@@ -138,7 +138,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     fun update() {
         ballPong.update()
-        checkBlockBallCollision()
+        checkBallBlockCollision()
         paddle.update()
         topPaddle.update()
         val screenHeight = height // Höjden på skärmen
@@ -225,37 +225,44 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     private fun rowBlockPosition(yPosition: Float) {
         yPositionList.add(yPosition)
-
+    }
+    private fun deleteBlockInList(block: BreakoutBlock) {
+        blockList.remove(block)
     }
 
     private fun addBlockInList(block: BreakoutBlock) {
         blockList.add(block)
     }
 
-    private fun deleteBlockInList(block: BreakoutBlock) {
-        blockList.remove(block)
-    }
+
+
 
     // Adding blocks in list in rows and columns
     private fun buildBreakoutBlocks() {
         var randomBitmap = Random.nextInt(0, 3)
-        val blockWidth = 175f
+        val blockWidth = 174f
         val blockHeight = 50f
 
         for (y in yPositionList) {
             for (x in xPositionList) {
-                addBlockInList(
-                    BreakoutBlock(
-                        this.context, x, y, x + blockWidth, y + blockHeight,
-                        randomBitmap
-                    )
-                )
+                addBlockInList(BreakoutBlock(this.context, x, y, x + blockWidth, y + blockHeight,
+                        randomBitmap))
                 randomBitmap = Random.nextInt(0, 3)
             }
         }
     }
+    private fun checkBallBlockCollision() {
+        for (block in blockList) {
+            if (onBlocksCollision(block, ballPong)) {
+                ballPong.speedY *= -1
+                deleteBlockInList(block)
+                break
+            }
+        }
+    }
 
-    private fun onBlockCollision(block: BreakoutBlock, ball: BallPong): Boolean {
+
+    private fun onBlocksCollision(block: BreakoutBlock, ball: BallPong): Boolean {
         // BlockX blir den närmsta punkten på breakout-blocket x/width mot bollens x-position
         val blockX = if (ball.posX < block.posX) {
             block.posX
@@ -276,18 +283,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         // Räkna avståndet mellan bollens och blockets X och Y med pythagoras sats och dra bort bollens size.
         val distance =
             sqrt((ball.posX - blockX).toDouble().pow(2.0) + (ball.posY - blockY).toDouble().pow(2.0))
-
         return distance < ball.size
-    }
-
-    private fun checkBlockBallCollision() {
-        for (block in blockList) {
-            if (onBlockCollision(block, ballPong)) {
-                ballPong.speedY *= -1
-                deleteBlockInList(block)
-                break
-            }
-        }
     }
 
 
