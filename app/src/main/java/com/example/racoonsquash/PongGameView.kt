@@ -143,6 +143,16 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         topPaddle.update()
         val screenHeight = height // Höjden på skärmen
 
+        // Check collision with the bottom paddle
+        if (isBallCollidingWithPaddle(ballPong, paddle)) {
+            ballPong.speedY = -ballPong.speedY // Reverse Y-direction
+        }
+
+        // Check collision with the top paddle
+        if (isBallCollidingWithPaddle(ballPong, topPaddle)) {
+            ballPong.speedY = -ballPong.speedY // Reverse Y-direction
+        }
+
 
         if (ballPong.posY < -ballPong.size) {
             updateScoreTop()
@@ -371,6 +381,18 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         ballPong.draw(canvas)
         holder.unlockCanvasAndPost(canvas)
+    }
+
+    private fun isBallCollidingWithPaddle(ball: BallPong, paddle: PaddlePong): Boolean {
+        // Check if the ball is within the horizontal bounds of the paddle
+        val horizontalCollision = ball.posX + ball.size > paddle.positionX - paddle.width / 2 &&
+                ball.posX - ball.size < paddle.positionX + paddle.width / 2
+
+        // Check if the ball is within the vertical bounds of the paddle
+        val verticalCollision = ball.posY + ball.size > paddle.positionY - paddle.height / 2 &&
+                ball.posY - ball.size < paddle.positionY + paddle.height / 2
+
+        return horizontalCollision && verticalCollision
     }
 
     //     Enbart spelplan med linje för syns skull, vänster sidolinje.

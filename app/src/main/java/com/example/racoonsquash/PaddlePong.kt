@@ -9,8 +9,8 @@ class PaddlePong(
     private val context: Context,
     initialX: Float,
     initialY: Float,
-    private val width: Float,
-    private val height: Float,
+    val width: Float,
+    val height: Float,
     color: Int
 ) {
     private val paint: Paint = Paint().apply {
