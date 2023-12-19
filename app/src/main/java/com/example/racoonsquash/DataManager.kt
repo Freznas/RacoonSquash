@@ -17,7 +17,7 @@ interface DataManager {
     fun addNewScore(score: Score)
 
 
-    data class Score(val userName:String, val score: Int, val game: Game)
+    data class Score(val userName: String, val score: Int, val game: Game)
 
     //Talar om alla spel i appen:
     enum class Game {

@@ -9,13 +9,18 @@
         android:id="@+id/nameListItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Name"
-        android:layout_weight="1"/>
+        android:text="@string/tv_list_item_name"
+        android:layout_weight="1"
+        android:padding="@dimen/tv_list_item_padding"
+        android:textSize="@dimen/tv_list_item_textsize"
+        android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/scoreListItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Score"
+        android:text="@string/tv_list_item_score"
+        android:padding="@dimen/tv_list_item_padding"
+        android:textSize="@dimen/tv_list_item_textsize"
         android:layout_weight="1"/>
 </LinearLayout>

@@ -14,7 +14,6 @@ open class BallPong(
     var speedX: Float,
     var speedY: Float,
     color: Int,
-    var speed: Float
 
     ) {
     var paint = Paint()
@@ -22,7 +21,6 @@ open class BallPong(
     init {
         paint.color = color
     }
-
 
     fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
@@ -33,18 +31,13 @@ open class BallPong(
             } else if (posX + size > bounds.right) {
                 posX = bounds.right - size
             }
+
+
         }
 
-        // Kolla övre och nedre vägg
-        if (posY - size < bounds.top || posY + size > bounds.bottom) {
-            speedY *= -1
-            if (posY - size < bounds.top) {
-                posY = bounds.top + size
-            } else if (posY + size > bounds.bottom) {
-                posY = bounds.bottom - size
-            }
-        }
+
     }
+
 
     open fun update() {
 
@@ -56,5 +49,4 @@ open class BallPong(
     open fun draw(canvas: Canvas?) {
         canvas?.drawCircle(posX, posY, size, paint)
     }
-
 }

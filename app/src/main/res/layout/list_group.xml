@@ -11,7 +11,7 @@
         android:id="@+id/gameListHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Game Header"
-        android:textSize="16sp"
+        android:text="@string/tv_list_group_header"
+        android:textSize="@dimen/tv_list_group_textsize"
         android:textStyle="bold" />
 </LinearLayout>

@@ -22,6 +22,7 @@ open class BallSquash(
         paint.color = color
     }
 
+    
     fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
         if (posX + size > bounds.right) {
