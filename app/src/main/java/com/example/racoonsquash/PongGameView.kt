@@ -26,8 +26,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private var scorePlayerTop = 0
     private var scorePlayerBottom = 0
     private val blockList: MutableList<BreakoutBlock> = mutableListOf()
-    val xPositionList: MutableList<Float> = mutableListOf()
-    val yPositionList: MutableList<Float> = mutableListOf()
+    private val xPositionList: MutableList<Float> = mutableListOf()
+    private val yPositionList: MutableList<Float> = mutableListOf()
     lateinit var ballPong: BallPong
     var bounds = Rect()
     var mHolder: SurfaceHolder? = holder
@@ -184,13 +184,46 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         }
     }
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        val blockWidth = 180f
+        val blockHeight = 50f
+        val centerX = (width / 2) - (blockWidth / 2)
+        val centerY = (height / 2) - (blockHeight / 2)
+        setup()
 
+        // Column positions
+        columnBlockPosition(centerX - 400f)
+        columnBlockPosition(centerX - 200f)
+        columnBlockPosition(centerX)
+        columnBlockPosition(centerX + 200f)
+        columnBlockPosition(centerX + 400f)
 
-    private fun columnBlockPlacement(xPosition: Float) {
+        // Row positions
+        rowBlockPosition(centerY - 140f)
+        rowBlockPosition(centerY - 70f)
+        rowBlockPosition(centerY)
+        rowBlockPosition(centerY + 70f)
+        rowBlockPosition(centerY + 140f)
+
+        buildBreakoutBlocks()
+    }
+
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        leftBoundaryPath = createBoundaryPathLeft(width, height)
+        rightBoundaryPath = createBoundaryPathRight(width, height)
+        bounds = Rect(0, 0, width, height)
+        start()
+
+    }
+
+    override fun surfaceDestroyed(holder: SurfaceHolder) {
+        stop()
+    }
+    private fun columnBlockPosition(xPosition: Float) {
         xPositionList.add(xPosition)
     }
 
-    private fun rowBlockPlacement(yPosition: Float) {
+    private fun rowBlockPosition(yPosition: Float) {
         yPositionList.add(yPosition)
 
     }
@@ -257,41 +290,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         }
     }
 
-    override fun surfaceCreated(holder: SurfaceHolder) {
-        val blockWidth = 180f
-        val blockHeight = 50f
-        val centerX = (width / 2) - (blockWidth / 2)
-        val centerY = (height / 2) - (blockHeight / 2)
-        setup()
-
-        // Blocks column-placement
-        columnBlockPlacement(centerX - 400f)
-        columnBlockPlacement(centerX - 200f)
-        columnBlockPlacement(centerX)
-        columnBlockPlacement(centerX + 200f)
-        columnBlockPlacement(centerX + 400f)
-
-        // Blocks row-placement
-        rowBlockPlacement(centerY - 140f)
-        rowBlockPlacement(centerY - 70f)
-        rowBlockPlacement(centerY)
-        rowBlockPlacement(centerY + 70f)
-        rowBlockPlacement(centerY + 140f)
-
-        buildBreakoutBlocks()
-    }
-
-    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        leftBoundaryPath = createBoundaryPathLeft(width, height)
-        rightBoundaryPath = createBoundaryPathRight(width, height)
-        bounds = Rect(0, 0, width, height)
-        start()
-
-    }
-
-    override fun surfaceDestroyed(holder: SurfaceHolder) {
-        stop()
-    }
 
     fun drawGameBounds(holder: SurfaceHolder) {
         val canvas: Canvas? = holder.lockCanvas()
