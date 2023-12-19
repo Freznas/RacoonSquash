@@ -236,11 +236,10 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
 
 
-
     // Adding blocks in list in rows and columns
     private fun buildBreakoutBlocks() {
         var randomBitmap = Random.nextInt(0, 3)
-        val blockWidth = 174f
+        val blockWidth = 175f
         val blockHeight = 50f
 
         for (y in yPositionList) {
@@ -253,7 +252,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
     private fun checkBallBlockCollision() {
         for (block in blockList) {
-            if (onBlocksCollision(block, ballPong)) {
+            if (onBlockCollision(block, ballPong)) {
                 ballPong.speedY *= -1
                 deleteBlockInList(block)
                 break
@@ -262,9 +261,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
 
 
-    private fun onBlocksCollision(block: BreakoutBlock, ball: BallPong): Boolean {
-        // BlockX blir den närmsta punkten på breakout-blocket x/width mot bollens x-position
-        val blockX = if (ball.posX < block.posX) {
+    private fun onBlockCollision(block: BreakoutBlock, ball: BallPong): Boolean {
+        // CommonX sparar bollens x-position om den befinner sig inom blockets x-position
+        val commonX = if (ball.posX < block.posX) {
             block.posX
         } else if (ball.posX > block.width) {
             block.width
@@ -272,21 +271,24 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             ball.posX
         }
 
-        // BlockY blir den näsrmsta punkten på breakout-blockets y/height mot bollens y-position
-        val blockY = if (ball.posY < block.posY) {
+        // CommonY sparar bollens y-position om den befinner sig inom blockets y-position
+        val commonY = if (ball.posY < block.posY) {
             block.posY
         } else if (ball.posY > block.height) {
             block.height
         } else {
             ball.posY
         }
-        // Räkna avståndet mellan bollens och blockets X och Y med pythagoras sats och dra bort bollens size.
+
+        // Här räknas distansen ut. Exempel, om bollens x-position är 50 och commonX
+        // är samma, dvs. 50 så blir x-distansens 0. Samma gäller för Y.
         val distance =
-            sqrt((ball.posX - blockX).toDouble().pow(2.0) + (ball.posY - blockY).toDouble().pow(2.0))
+            sqrt((ball.posX - commonX).toDouble().pow(2.0) + (ball.posY - commonY).toDouble().pow(2.0))
+
+        // Returnerar true när distansen är 0 och drar bort bollens size.
         return distance < ball.size
+
     }
-
-
     fun drawGameBounds(holder: SurfaceHolder) {
         val canvas: Canvas? = holder.lockCanvas()
 
