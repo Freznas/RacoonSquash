@@ -18,7 +18,7 @@ class CustomPongBall (context: Context,
     init {
 
         val smallerSize = BitmapFactory.Options()
-        smallerSize.inSampleSize = 14
+        smallerSize.inSampleSize = 18
 
         bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.custom_pongball_green, smallerSize)
 
