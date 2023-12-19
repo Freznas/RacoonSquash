@@ -26,8 +26,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private var scorePlayerTop = 0
     private var scorePlayerBottom = 0
     private val blockList: MutableList<BreakoutBlock> = mutableListOf()
-    val xPositionList: MutableList<Float> = mutableListOf()
-    val yPositionList: MutableList<Float> = mutableListOf()
+    private val xPositionList: MutableList<Float> = mutableListOf()
+    private val yPositionList: MutableList<Float> = mutableListOf()
     lateinit var ballPong: BallPong
     var bounds = Rect()
     var mHolder: SurfaceHolder? = holder
@@ -138,7 +138,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     fun update() {
         ballPong.update()
-        checkBlockBallCollision()
+        checkBallBlockCollision()
         paddle.update()
         topPaddle.update()
         val screenHeight = height // Höjden på skärmen
@@ -194,79 +194,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         }
     }
-
-
-    private fun columnBlockPlacement(xPosition: Float) {
-        xPositionList.add(xPosition)
-    }
-
-    private fun rowBlockPlacement(yPosition: Float) {
-        yPositionList.add(yPosition)
-
-    }
-
-    private fun addBlockInList(block: BreakoutBlock) {
-        blockList.add(block)
-    }
-
-    private fun deleteBlockInList(block: BreakoutBlock) {
-        blockList.remove(block)
-    }
-
-    // Adding blocks in list in rows and columns
-    private fun buildBreakoutBlocks() {
-        var randomBitmap = Random.nextInt(0, 3)
-        val blockWidth = 175f
-        val blockHeight = 50f
-
-        for (y in yPositionList) {
-            for (x in xPositionList) {
-                addBlockInList(
-                    BreakoutBlock(
-                        this.context, x, y, x + blockWidth, y + blockHeight,
-                        randomBitmap
-                    )
-                )
-                randomBitmap = Random.nextInt(0, 3)
-            }
-        }
-    }
-
-    private fun onBlockCollision(block: BreakoutBlock, ball: BallPong): Boolean {
-        // BlockX blir den närmsta punkten på breakout-blocket x/width mot bollens x-position
-        val blockX = if (ball.posX < block.posX) {
-            block.posX
-        } else if (ball.posX > block.width) {
-            block.width
-        } else {
-            ball.posX
-        }
-
-        // BlockY blir den näsrmsta punkten på breakout-blockets y/height mot bollens y-position
-        val blockY = if (ball.posY < block.posY) {
-            block.posY
-        } else if (ball.posY > block.height) {
-            block.height
-        } else {
-            ball.posY
-        }
-        // Räkna avståndet mellan bollens och blockets X och Y med pythagoras sats och dra bort bollens size.
-        val distance =
-            sqrt((ball.posX - blockX).toDouble().pow(2.0) + (ball.posY - blockY).toDouble().pow(2.0))
-
-        return distance < ball.size
-    }
-
-    private fun checkBlockBallCollision() {
-        for (block in blockList) {
-            if (onBlockCollision(block, ballPong)) {
-                ballPong.speedY *= -1
-                deleteBlockInList(block)
-                break
-            }
-        }
-    }
-
     override fun surfaceCreated(holder: SurfaceHolder) {
         val blockWidth = 180f
         val blockHeight = 50f
@@ -274,19 +201,19 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         val centerY = (height / 2) - (blockHeight / 2)
         setup()
 
-        // Blocks column-placement
-        columnBlockPlacement(centerX - 400f)
-        columnBlockPlacement(centerX - 200f)
-        columnBlockPlacement(centerX)
-        columnBlockPlacement(centerX + 200f)
-        columnBlockPlacement(centerX + 400f)
+        // Column positions
+        columnBlockPosition(centerX - 400f)
+        columnBlockPosition(centerX - 200f)
+        columnBlockPosition(centerX)
+        columnBlockPosition(centerX + 200f)
+        columnBlockPosition(centerX + 400f)
 
-        // Blocks row-placement
-        rowBlockPlacement(centerY - 140f)
-        rowBlockPlacement(centerY - 70f)
-        rowBlockPlacement(centerY)
-        rowBlockPlacement(centerY + 70f)
-        rowBlockPlacement(centerY + 140f)
+        // Row positions
+        rowBlockPosition(centerY - 140f)
+        rowBlockPosition(centerY - 70f)
+        rowBlockPosition(centerY)
+        rowBlockPosition(centerY + 70f)
+        rowBlockPosition(centerY + 140f)
 
         buildBreakoutBlocks()
     }
@@ -302,7 +229,76 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         stop()
     }
+    private fun columnBlockPosition(xPosition: Float) {
+        xPositionList.add(xPosition)
+    }
 
+    private fun rowBlockPosition(yPosition: Float) {
+        yPositionList.add(yPosition)
+    }
+    private fun deleteBlockInList(block: BreakoutBlock) {
+        blockList.remove(block)
+    }
+
+    private fun addBlockInList(block: BreakoutBlock) {
+        blockList.add(block)
+    }
+
+
+
+    // Adding blocks in list in rows and columns
+    private fun buildBreakoutBlocks() {
+        var randomBitmap = Random.nextInt(0, 3)
+        val blockWidth = 175f
+        val blockHeight = 50f
+
+        for (y in yPositionList) {
+            for (x in xPositionList) {
+                addBlockInList(BreakoutBlock(this.context, x, y, x + blockWidth, y + blockHeight,
+                        randomBitmap))
+                randomBitmap = Random.nextInt(0, 3)
+            }
+        }
+    }
+    private fun checkBallBlockCollision() {
+        for (block in blockList) {
+            if (onBlockCollision(block, ballPong)) {
+                ballPong.speedY *= -1
+                deleteBlockInList(block)
+                break
+            }
+        }
+    }
+
+
+    private fun onBlockCollision(block: BreakoutBlock, ball: BallPong): Boolean {
+        // CommonX sparar bollens x-position om den befinner sig inom blockets x-position
+        val commonX = if (ball.posX < block.posX) {
+            block.posX
+        } else if (ball.posX > block.width) {
+            block.width
+        } else {
+            ball.posX
+        }
+
+        // CommonY sparar bollens y-position om den befinner sig inom blockets y-position
+        val commonY = if (ball.posY < block.posY) {
+            block.posY
+        } else if (ball.posY > block.height) {
+            block.height
+        } else {
+            ball.posY
+        }
+
+        // Här räknas distansen ut. Exempel, om bollens x-position är 50 och commonX
+        // är samma, dvs. 50 så blir x-distansens 0. Samma gäller för Y.
+        val distance =
+            sqrt((ball.posX - commonX).toDouble().pow(2.0) + (ball.posY - commonY).toDouble().pow(2.0))
+
+        // Returnerar true när distansen är 0 och drar bort bollens size.
+        return distance < ball.size
+
+    }
     fun drawGameBounds(holder: SurfaceHolder) {
         val canvas: Canvas? = holder.lockCanvas()
 
