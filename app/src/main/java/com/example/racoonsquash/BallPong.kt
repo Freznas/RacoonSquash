@@ -49,5 +49,4 @@ open class BallPong(
     open fun draw(canvas: Canvas?) {
         canvas?.drawCircle(posX, posY, size, paint)
     }
-
 }

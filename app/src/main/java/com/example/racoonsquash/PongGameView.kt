@@ -12,6 +12,7 @@ import android.view.SurfaceView
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
+import android.view.MotionEvent
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -32,6 +33,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     var mHolder: SurfaceHolder? = holder
     private val initialBallPosX = 500f
     private val initialBallPosY = 700f
+    private lateinit var paddle: PaddlePong
+    private lateinit var topPaddle: PaddlePong
 
     init {
         if (mHolder != null) {
@@ -70,10 +73,50 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         setup()
     }
 
+    private val screenWidth = resources.displayMetrics.widthPixels
+    private val screenHeight = resources.displayMetrics.heightPixels
+
     private fun setup() {
         ballPong = CustomPongBall(context, 100f, 100f, 30f, 20f, 20f, 0)
-
+        paddle = PaddlePong(
+            context,
+            screenWidth / 2f,
+            screenHeight - 100f,  // for bottom paddle
+            180f,
+            20f,
+            Color.parseColor("#FFFF00")
+        )
+        topPaddle = PaddlePong(
+            context,
+            screenWidth / 2f,
+            50f,  // for top paddle
+            180f,
+            20f,
+            Color.parseColor("#FFFF00")
+        )
     }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        when (event.action) {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                // Move both paddles in sync based on the touch input
+                val newX = event.x
+                paddle.move(newX)
+                topPaddle.move(newX)
+
+                performClick()
+            }
+        }
+        return true
+    }
+
+    override fun performClick(): Boolean {
+        // Call the super implementation to handle the click event
+        super.performClick()
+        // Return true if the click event is handled
+        return true
+    }
+
 
     fun start() {
         running = true
@@ -96,6 +139,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     fun update() {
         ballPong.update()
         checkBlockBallCollision()
+        paddle.update()
+        topPaddle.update()
         val screenHeight = height // Höjden på skärmen
 
 
@@ -217,6 +262,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         val blockHeight = 50f
         val centerX = (width / 2) - (blockWidth / 2)
         val centerY = (height / 2) - (blockHeight / 2)
+        setup()
 
         // Blocks column-placement
         columnBlockPlacement(centerX - 400f)
@@ -312,6 +358,10 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                 )
 
         }
+
+        // Draw the paddles
+        paddle.draw(canvas!!)
+        topPaddle.draw(canvas)
 
         //Draw all blocks
         for (block in blockList) {
