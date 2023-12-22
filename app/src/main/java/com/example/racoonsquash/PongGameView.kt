@@ -23,18 +23,23 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     var touchColor: Paint
     var scorePaint: Paint
     private var textGameOverPaint: Paint
-    private var scorePlayerTop = 0
-    private var scorePlayerBottom = 0
+//    private var scorePlayerTop = 0
+//    private var scorePlayerBottom = 0
     private val blockList: MutableList<BreakoutBlock> = mutableListOf()
     private val xPositionList: MutableList<Float> = mutableListOf()
     private val yPositionList: MutableList<Float> = mutableListOf()
     lateinit var ballPong: BallPong
     var bounds = Rect()
     var mHolder: SurfaceHolder? = holder
-    private val initialBallPosX = 500f
-    private val initialBallPosY = 700f
+//    private val initialBallPosX = 500f
+//    private val initialBallPosY = 700f
+    private var score = 0
     private lateinit var paddle: PaddlePong
     private lateinit var topPaddle: PaddlePong
+    private val initialBallPosXForTop = 500f
+    private val initialBallPosYForTop = 1300f
+    private val initialBallPosXForBottom = 300f
+    private val initialBallPosYForBottom = 500f
 
     init {
         if (mHolder != null) {
@@ -77,7 +82,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
-        ballPong = CustomPongBall(context, 100f, 100f, 30f, 20f, 20f, 0)
+        ballPong = CustomPongBall(context, 100f, 100f, 30f, 10f, 10f, 0)
         paddle = PaddlePong(
             context,
             screenWidth / 2f,
@@ -155,35 +160,48 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
 
         if (ballPong.posY < -ballPong.size) {
-            updateScoreTop()
+//            updateScoreTop()
+//            updateScore()
             resetBallPosition()
 
         } else if (ballPong.posY > screenHeight + ballPong.size) {
-            updateScoreBottom()
+//            updateScoreBottom()
+//            updateScore()
             resetBallPosition()
 
         } else if (ballPong.posX < 0) {
-            scorePlayerBottom = 0
-            scorePlayerTop = 0
+//            scorePlayerBottom = 0
+//            scorePlayerTop = 0
+              score = 0
 
         }
-        if (scorePlayerBottom >= 11 || scorePlayerTop >= 11) {
+        if (score >= 11) {
 
             try {
                 Thread.sleep(5000)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-            scorePlayerBottom = 0
-            scorePlayerTop = 0
+            score = 0
+//            scorePlayerBottom = 0
+//            scorePlayerTop = 0
             resetBallPosition()
         }
     }
 
     private fun resetBallPosition() {
-        ballPong.posX = initialBallPosX
-        ballPong.posY = initialBallPosY
+        // Placera bollen på olika startpositioner beroende på var den åker ut
+        if (ballPong.posY < -ballPong.size) {
+
+            ballPong.posX = initialBallPosXForTop
+            ballPong.posY = initialBallPosYForTop
+        } else if (ballPong.posY > screenHeight + ballPong.size) {
+
+            ballPong.posX = initialBallPosXForBottom
+            ballPong.posY = initialBallPosYForBottom
+        }
     }
+
 
 
     override fun run() {
@@ -310,7 +328,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             if (ballPong.posY < 0 - ballPong.size) {
                 canvas?.drawPath(it, touchColor)
                 canvas?.drawText(
-                    "Score: $scorePlayerBottom",
+                    "Score: $score",
                     canvas.width.toFloat() - 400,
                     0f + 100,
                     textGameOverPaint
@@ -320,13 +338,13 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             } else {
                 // Placera text
                 canvas?.drawText(
-                    "Score: $scorePlayerBottom",
+                    "Score: $score",
                     canvas.width.toFloat() - 400,
                     0f + 100,
                     scorePaint
                 )
             }
-            if (scorePlayerBottom >= 10)
+            if (score >= 10)
                 canvas?.drawText(
                     "GAME OVER",
                     canvas.width.toFloat() / 3,
@@ -337,31 +355,31 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         leftBoundaryPath?.let {
             canvas?.drawPath(it, lineColor)
-            if (ballPong.posY < 0 - ballPong.size) {
-                canvas?.drawPath(it, touchColor)
-                canvas?.drawText(
-                    "Score: $scorePlayerTop",
-                    canvas.width.toFloat() - 400,
-                    0f + 200,
-                    textGameOverPaint
-                )
-
-            } else {
-                // Placera text
-                canvas?.drawText(
-                    "Score: $scorePlayerTop",
-                    canvas.width.toFloat() - 400,
-                    canvas.height -700f, // Såg ej text i emulator, så ändrade tillfälligt.
-                    scorePaint
-                )
-            }
-            if (scorePlayerTop >= 10)
-                canvas?.drawText(
-                    "GAME OVER",
-                    canvas.width.toFloat() / 3,
-                    canvas.height.toFloat() / 4,
-                    textGameOverPaint
-                )
+//            if (ballPong.posY < 0 - ballPong.size) {
+//                canvas?.drawPath(it, touchColor)
+//                canvas?.drawText(
+//                    "Score: $scorePlayerTop",
+//                    canvas.width.toFloat() - 400,
+//                    0f + 200,
+//                    textGameOverPaint
+//                )
+//
+//            } else {
+//                // Placera text
+//                canvas?.drawText(
+//                    "Score: $scorePlayerTop",
+//                    canvas.width.toFloat() - 400,
+//                    canvas.height -700f, // Såg ej text i emulator, så ändrade tillfälligt.
+//                    scorePaint
+//                )
+//            }
+//            if (scorePlayerTop >= 10)
+//                canvas?.drawText(
+//                    "GAME OVER",
+//                    canvas.width.toFloat() / 3,
+//                    canvas.height.toFloat() / 4,
+//                    textGameOverPaint
+//                )
 
         }
 
@@ -410,14 +428,17 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         return pathRight
     }
-
-    private fun updateScoreTop(): Int {
-        scorePlayerTop++
-        return scorePlayerTop
+    private fun updateScore(): Int {
+        score++
+        return score
     }
-
-    private fun updateScoreBottom(): Int {
-        scorePlayerBottom++
-        return scorePlayerBottom
-    }
+//    private fun updateScoreTop(): Int {
+//        scorePlayerTop++
+//        return scorePlayerTop
+//    }
+//
+//    private fun updateScoreBottom(): Int {
+//        scorePlayerBottom++
+//        return scorePlayerBottom
+//    }
 }
