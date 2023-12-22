@@ -187,6 +187,8 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             onBallCollision(ballSquash1, squashPad)
         }
     }
+
+
     //dessa startar och stoppar min thread:
     override fun surfaceCreated(holder: SurfaceHolder) {
     }
