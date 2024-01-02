@@ -41,7 +41,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
 
-    private val soundEffect =  SoundEffect(context)
+    private val soundEffect = SoundEffect(context)
 
     init {
         if (mHolder != null) {
