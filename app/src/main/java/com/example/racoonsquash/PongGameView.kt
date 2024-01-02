@@ -166,6 +166,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         if (ballPong.posY < -ballPong.size) {
 //            updateScoreTop()
 //            updateScore()
+            soundEffect.play(2)
             resetBallPosition()
 
         } else if (ballPong.posY > screenHeight + ballPong.size) {
@@ -286,7 +287,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         for (block in blockList) {
             if (onBlockCollision(block, ballPong)) {
                 ballPong.speedY *= -1
-                soundEffect.play(1)
+                soundEffect.play(3)
                 deleteBlockInList(block)
                 break
             }
