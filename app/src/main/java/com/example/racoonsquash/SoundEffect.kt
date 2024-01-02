@@ -8,8 +8,8 @@ class SoundEffect (context: Context) : Sound {
     // Soundpool-objekt med max antal ljud som kan spelas samtidigt
     private val soundPool: SoundPool = SoundPool.Builder().setMaxStreams(10).build()
 
-    private val bounceSound: Int = soundPool.load(context, R.raw.bounce, 0)
-    private val breakSound: Int = soundPool.load(context, R.raw.breakblock, 1)
+    private val bounceSound: Int = soundPool.load(context, R.raw.paddlebounce, 0)
+    private val breakSound: Int = soundPool.load(context, R.raw.wallbounce, 1)
     private val gameOverSound: Int = soundPool.load(context, R.raw.lose, 2)
     private val upSound: Int = soundPool.load(context, R.raw.up, 1)
 

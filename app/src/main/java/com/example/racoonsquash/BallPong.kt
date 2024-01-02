@@ -26,7 +26,7 @@ open class BallPong(
     fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
         if (posX - size < bounds.left || posX + size > bounds.right) {
-            soundEffect.play(0)
+            soundEffect.play(1)
             speedX *= -1
             if (posX - size < bounds.left) {
                 posX = bounds.left + size
