@@ -1,0 +1,31 @@
+package com.example.racoonsquash
+
+import android.content.Context
+import android.media.SoundPool
+
+class SoundEffect (context: Context) : Sound {
+
+    // Soundpool-objekt med max antal ljud som kan spelas samtidigt
+    private val soundPool: SoundPool = SoundPool.Builder().setMaxStreams(10).build()
+
+    private val bounceSound: Int = soundPool.load(context, R.raw.bounce, 0)
+    private val breakSound: Int = soundPool.load(context, R.raw.breakblock, 1)
+    private val gameOverSound: Int = soundPool.load(context, R.raw.lose, 2)
+
+    // Sätter id på varje ljud och beroende på id, spela upp ljudeffekt
+    private var audioID: Int = 0
+    override fun play(id: Int) {
+
+        this.audioID = id
+
+        when(id) {
+            0 -> soundPool.play(bounceSound, 1.0f, 1.0f, 0, 0, 1.0f)
+            1 -> soundPool.play(breakSound, 1.0f, 1.0f, 1, 0, 1.0f)
+            2 -> soundPool.play(gameOverSound, 1.0f, 1.0f, 1, 0, 1.0f)
+        }
+    }
+
+    override fun stop() {
+        soundPool.stop(audioID)
+    }
+}

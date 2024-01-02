@@ -41,6 +41,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
 
+    private val soundEffect =  SoundEffect(context)
+
     init {
         if (mHolder != null) {
             mHolder?.addCallback(this)
@@ -150,11 +152,13 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         // Check collision with the bottom paddle
         if (isBallCollidingWithPaddle(ballPong, paddle)) {
+            soundEffect.play(0)
             ballPong.speedY = -ballPong.speedY // Reverse Y-direction
         }
 
         // Check collision with the top paddle
         if (isBallCollidingWithPaddle(ballPong, topPaddle)) {
+            soundEffect.play(0)
             ballPong.speedY = -ballPong.speedY // Reverse Y-direction
         }
 
@@ -282,6 +286,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         for (block in blockList) {
             if (onBlockCollision(block, ballPong)) {
                 ballPong.speedY *= -1
+                soundEffect.play(1)
                 deleteBlockInList(block)
                 break
             }

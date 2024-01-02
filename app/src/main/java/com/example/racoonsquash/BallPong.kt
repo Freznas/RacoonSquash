@@ -16,6 +16,7 @@ open class BallPong(
     color: Int,
 
     ) {
+    private val soundEffect =  SoundEffect(context)
     var paint = Paint()
 
     init {
@@ -25,17 +26,14 @@ open class BallPong(
     fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
         if (posX - size < bounds.left || posX + size > bounds.right) {
+            soundEffect.play(0)
             speedX *= -1
             if (posX - size < bounds.left) {
                 posX = bounds.left + size
             } else if (posX + size > bounds.right) {
                 posX = bounds.right - size
             }
-
-
         }
-
-
     }
 
 
