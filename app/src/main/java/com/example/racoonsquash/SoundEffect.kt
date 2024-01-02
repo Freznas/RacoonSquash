@@ -11,10 +11,11 @@ class SoundEffect (context: Context) : Sound {
     private val bounceSound: Int = soundPool.load(context, R.raw.bounce, 0)
     private val breakSound: Int = soundPool.load(context, R.raw.breakblock, 1)
     private val gameOverSound: Int = soundPool.load(context, R.raw.lose, 2)
+    private val upSound: Int = soundPool.load(context, R.raw.up, 1)
 
     // Sätter id på varje ljud och beroende på id, spela upp ljudeffekt
     private var audioID: Int = 0
-    
+
     override fun play(id: Int) {
 
         this.audioID = id
@@ -23,6 +24,7 @@ class SoundEffect (context: Context) : Sound {
             0 -> soundPool.play(bounceSound, 1.0f, 1.0f, 0, 0, 1.0f)
             1 -> soundPool.play(breakSound, 1.0f, 1.0f, 1, 0, 1.0f)
             2 -> soundPool.play(gameOverSound, 1.0f, 1.0f, 1, 0, 1.0f)
+            3 -> soundPool.play(upSound, 1.0f, 1.0f, 1, 0, 1.0f)
         }
     }
 
