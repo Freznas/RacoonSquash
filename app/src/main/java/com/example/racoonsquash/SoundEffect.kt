@@ -14,6 +14,7 @@ class SoundEffect (context: Context) : Sound {
 
     // Sätter id på varje ljud och beroende på id, spela upp ljudeffekt
     private var audioID: Int = 0
+    
     override fun play(id: Int) {
 
         this.audioID = id
