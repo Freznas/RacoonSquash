@@ -112,7 +112,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         ballIntersects(ballSquash, squashPad)
         ballSquash.update()
         // Räknar bara när boll rör långsidan just nu
-        if (ballSquash.posX > width - ballSquash.size) {
+        if (ballSquash.ballPositionX > width - ballSquash.ballSize) {
             updateScore()
         }
     }
@@ -139,7 +139,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             val y = event.y.toInt()
             if (!isInsidePauseRectangule(x, y)) {
                 // User is not clicking on pause
-                squashPad.posY = event.y // Move pad
+                squashPad.ballPositionY = event.y // Move pad
             } else if (isInsidePauseRectangule(x, y) && event.action == MotionEvent.ACTION_DOWN) {
                 // User is clicking on Pause
                 buttonPauseText = if (isPaused) context.getString(R.string.pauseText)
@@ -161,25 +161,25 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 // sen så räknas vinkeln genom multiplicera normaliserade värdet.
     fun onBallCollision(ballSquash1: BallSquash, squashPad: SquashPad) {
 
-        val relativeIntersectY = squashPad.posY - ballSquash1.posY
+        val relativeIntersectY = squashPad.ballPositionY - ballSquash1.ballPositionY
         val normalizedIntersectY = (relativeIntersectY / (squashPad.height / 2)).coerceIn(-1f, 1f)
         val bounceAngle =
             normalizedIntersectY * Math.PI / 7
 
-        ballSquash1.speedX = (ballSquash1.speed * Math.cos(bounceAngle)).toFloat()
-        ballSquash1.speedY = (-ballSquash1.speed * Math.sin(bounceAngle)).toFloat()
+        ballSquash1.ballSpeedX = (ballSquash1.speed * Math.cos(bounceAngle)).toFloat()
+        ballSquash1.ballSpeedY = (-ballSquash1.speed * Math.sin(bounceAngle)).toFloat()
     }
 
     // här tar vi in storlek från ball och squashPad och kontrollerar när en kollision sker
     fun ballIntersects(ballSquash1: BallSquash, squashPad: SquashPad) {
-        val padLeft = squashPad.posX - squashPad.width
-        val padRight = squashPad.posX + squashPad.width
-        val padTop = squashPad.posY - squashPad.height
-        val padBottom = squashPad.posY + squashPad.height
-        val ballLeft = ballSquash1.posX - ballSquash1.size
-        val ballRight = ballSquash1.posX + ballSquash1.size
-        val ballTop = ballSquash1.posY - ballSquash1.size
-        val ballBottom = ballSquash1.posY + ballSquash1.size
+        val padLeft = squashPad.ballPositionX - squashPad.width
+        val padRight = squashPad.ballPositionX + squashPad.width
+        val padTop = squashPad.ballPositionY - squashPad.height
+        val padBottom = squashPad.ballPositionY + squashPad.height
+        val ballLeft = ballSquash1.ballPositionX - ballSquash1.ballSize
+        val ballRight = ballSquash1.ballPositionX + ballSquash1.ballSize
+        val ballTop = ballSquash1.ballPositionY - ballSquash1.ballSize
+        val ballBottom = ballSquash1.ballPositionY + ballSquash1.ballSize
 
         if (ballRight >= padLeft && ballLeft <= padRight && ballBottom >= padTop && ballTop <=
             padBottom
@@ -271,7 +271,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         holder.unlockCanvasAndPost(canvas)
     }
 
-    private fun isGameOver() = ballSquash.posX < 0 - ballSquash.size
+    private fun isGameOver() = ballSquash.ballPositionX < 0 - ballSquash.ballSize
 
     // För syns skull gör en Path med färgade linjer för gränserna.
     private fun createBoundaryPath(width: Int, height: Int): Path {

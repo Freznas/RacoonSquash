@@ -7,8 +7,8 @@ import android.graphics.RectF
 
 class PaddlePong(
     private val context: Context,
-    initialX: Float,
-    initialY: Float,
+    var padPositionX: Float,
+    var padPositionY: Float,
     val width: Float,
     val height: Float,
     color: Int
@@ -18,12 +18,9 @@ class PaddlePong(
         style = Paint.Style.FILL
     }
 
-    var positionX: Float = initialX
-    var positionY: Float = initialY
-
     private var paddleRect: RectF = RectF(
-        positionX - width / 2, positionY - height / 2,
-        positionX + width / 2, positionY + height / 2
+        this.padPositionX - width / 2, this.padPositionY - height / 2,
+        this.padPositionX + width / 2, this.padPositionY + height / 2
     )
 
     fun draw(canvas: Canvas) {
@@ -31,20 +28,20 @@ class PaddlePong(
     }
 
     fun move(newX: Float) {
-        positionX = newX
+        padPositionX = newX
         keepPaddleInBounds()
         updatePaddleRect()
     }
 
     private fun keepPaddleInBounds() {
         val screenWidth = context.resources.displayMetrics.widthPixels
-        positionX = positionX.coerceIn(width / 2, screenWidth - width / 2)
+        padPositionX = padPositionX.coerceIn(width / 2, screenWidth - width / 2)
     }
 
     private fun updatePaddleRect() {
         paddleRect.set(
-            positionX - width / 2, positionY - height / 2,
-            positionX + width / 2, positionY + height / 2
+            padPositionX - width / 2, padPositionY - height / 2,
+            padPositionX + width / 2, padPositionY + height / 2
         )
     }
 
