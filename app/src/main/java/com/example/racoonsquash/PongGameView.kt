@@ -51,6 +51,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val initialBallPosYForBottom = 500f
     private var lives = 3 // Antal liv
 
+    private var isPaused = false
 
     private val soundEffect = SoundEffect(context)
 
@@ -95,7 +96,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
-      
+
         ballPong = BallPong(context, 100f, 100f, 30f, 15f, 15f, 0)
 
         paddle = PaddlePong(
@@ -115,11 +116,21 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             Color.parseColor("#FFFF00")
         )
     }
+
     fun setupButton(button: ImageButton) {
         button.setOnClickListener {
-
-            // PAUSE GAME!!!!
+            if (!onPaused()) {
+                isPaused = true
+            } else if (onPaused()) {
+                isPaused = false
+            }
         }
+    }
+    private fun onPaused(): Boolean {
+        if(isPaused) {
+            return true
+        }
+        return false
     }
 
     private fun smallerSurfaceLayout(width: Int, height: Int) {
@@ -175,9 +186,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     private fun loseLife() {
         lives--
-        if(lives<=0){
+        if (lives <= 0) {
             soundEffect.play(2)
-            isGameOver =true
+            isGameOver = true
         }
     }
 
@@ -268,10 +279,11 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     override fun run() {
         while (running) {
-            update()
-            drawGameBounds(holder)
-            ballPong.checkBounds(bounds)
-
+            if (!isPaused) {
+                update()
+                drawGameBounds(holder)
+                ballPong.checkBounds(bounds)
+            }
         }
     }
 
@@ -449,9 +461,11 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                     canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
-            if(isGameWon)
-                canvas?.drawText("CONGRATZ",canvas.width.toFloat() / 3,
-                    canvas.height.toFloat() - 300,gameWonPaint)
+            if (isGameWon)
+                canvas?.drawText(
+                    "CONGRATZ", canvas.width.toFloat() / 3,
+                    canvas.height.toFloat() - 300, gameWonPaint
+                )
         }
 
         leftBoundaryPath?.let {
