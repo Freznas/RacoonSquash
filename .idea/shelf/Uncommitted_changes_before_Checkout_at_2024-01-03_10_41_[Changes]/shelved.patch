@@ -1,0 +1,267 @@
+Index: app/src/main/java/com/example/racoonsquash/PongGameView.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.racoonsquash\r\n\r\nimport android.content.Context\r\nimport android.graphics.Canvas\r\nimport android.graphics.Color\r\nimport android.graphics.Paint\r\nimport android.graphics.Path\r\nimport android.graphics.Rect\r\nimport android.graphics.Typeface\r\nimport android.view.SurfaceHolder\r\nimport android.view.SurfaceView\r\nimport kotlin.math.pow\r\nimport kotlin.math.sqrt\r\nimport kotlin.random.Random\r\nimport android.view.MotionEvent\r\n\r\nclass PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {\r\n    var thread: Thread? = null\r\n    var running = false\r\n    var lineColor: Paint\r\n    private var leftBoundaryPath: Path? = null\r\n    private var rightBoundaryPath: Path? = null\r\n    var touchColor: Paint\r\n    var scorePaint: Paint\r\n\r\n    private var textGameOverPaint: Paint\r\n\r\n    //    private var scorePlayerTop = 0\r\n//    private var scorePlayerBottom = 0\r\n    private val blockList: MutableList<BreakoutBlock> = mutableListOf()\r\n    private val xPositionList: MutableList<Float> = mutableListOf()\r\n    private val yPositionList: MutableList<Float> = mutableListOf()\r\n    lateinit var ballPong: BallPong\r\n    var bounds = Rect()\r\n    var mHolder: SurfaceHolder? = holder\r\n\r\n    //    private val initialBallPosX = 500f\r\n//    private val initialBallPosY = 700f\r\n    var isGameOver = false\r\n    private var score = 0\r\n    private lateinit var paddle: PaddlePong\r\n    private lateinit var topPaddle: PaddlePong\r\n    private val initialBallPosXForTop = 500f\r\n    private val initialBallPosYForTop = 1300f\r\n    private val initialBallPosXForBottom = 300f\r\n    private val initialBallPosYForBottom = 500f\r\n    private var lives = 3// Antal liv\r\n\r\n    init {\r\n        if (mHolder != null) {\r\n            mHolder?.addCallback(this)\r\n        }\r\n\r\n        lineColor = Paint().apply {\r\n            color = Color.CYAN\r\n            style = Paint.Style.STROKE\r\n            strokeWidth = 10f\r\n\r\n            scorePaint = Paint().apply {\r\n                color = Color.GREEN\r\n                alpha = 200\r\n                textSize = 60.0F\r\n                typeface = Typeface.create(\"serif-monospace\", Typeface.BOLD)\r\n            }\r\n            textGameOverPaint = Paint().apply {\r\n                color = Color.RED\r\n                alpha = 200\r\n                textSize = 60.0F\r\n                typeface = Typeface.create(\"serif-monospace\", Typeface.BOLD)\r\n            }\r\n            // Enbart för att synliggöra gränserna\r\n            lineColor = Paint().apply {\r\n                color = Color.MAGENTA\r\n                style = Paint.Style.STROKE\r\n                strokeWidth = 10f\r\n            }\r\n            touchColor = Paint().apply {\r\n                color = Color.RED\r\n                style = Paint.Style.STROKE\r\n                strokeWidth = 50f\r\n            }\r\n        }\r\n        setup()\r\n    }\r\n\r\n    private val screenWidth = resources.displayMetrics.widthPixels\r\n    private val screenHeight = resources.displayMetrics.heightPixels\r\n\r\n    private fun setup() {\r\n        ballPong = CustomPongBall(context, 100f, 100f, 30f, 10f, 10f, 0)\r\n        paddle = PaddlePong(\r\n            context,\r\n            screenWidth / 2f,\r\n            screenHeight - 100f,  // for bottom paddle\r\n            180f,\r\n            20f,\r\n            Color.parseColor(\"#FFFF00\")\r\n        )\r\n        topPaddle = PaddlePong(\r\n            context,\r\n            screenWidth / 2f,\r\n            50f,  // for top paddle\r\n            180f,\r\n            20f,\r\n            Color.parseColor(\"#FFFF00\")\r\n        )\r\n    }\r\n\r\n    override fun onTouchEvent(event: MotionEvent): Boolean {\r\n        when (event.action) {\r\n            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {\r\n                // Move both paddles in sync based on the touch input\r\n                val newX = event.x\r\n                paddle.move(newX)\r\n                topPaddle.move(newX)\r\n\r\n                performClick()\r\n            }\r\n        }\r\n        return true\r\n    }\r\n\r\n    override fun performClick(): Boolean {\r\n        // Call the super implementation to handle the click event\r\n        super.performClick()\r\n        // Return true if the click event is handled\r\n        return true\r\n    }\r\n\r\n\r\n    fun start() {\r\n\r\n        running = true\r\n        thread = Thread(this) //en trad har en konstruktor som tar in en runnable,\r\n        // vilket sker i denna klass se rad 10\r\n        thread?.start()\r\n\r\n    }\r\n\r\n    fun stop() {\r\n        running = false\r\n        thread?.join()\r\n        try {\r\n            thread?.join() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv\r\n        } catch (e: InterruptedException) {\r\n            e.printStackTrace()\r\n        }\r\n    }\r\n\r\n\r\n    private fun loseLife() {\r\n        lives--\r\n        if(lives<=0){\r\n            isGameOver =true\r\n        }\r\n            }\r\n\r\n\r\n    fun update() {\r\n        ballPong.update()\r\n        checkBallBlockCollision()\r\n        paddle.update()\r\n        topPaddle.update()\r\n        val screenHeight = height // Höjden på skärmen\r\n        if (lives <= 0) {\r\n\r\n            stop()\r\n\r\n        }\r\n        // Check collision with the bottom paddle\r\n        if (isBallCollidingWithPaddle(ballPong, paddle)) {\r\n            ballPong.speedY = -ballPong.speedY // Reverse Y-direction\r\n        }\r\n\r\n        // Check collision with the top paddle\r\n        if (isBallCollidingWithPaddle(ballPong, topPaddle)) {\r\n            ballPong.speedY = -ballPong.speedY // Reverse Y-direction\r\n        }\r\n\r\n\r\n        if (ballPong.posY < -ballPong.size) {\r\n            loseLife()\r\n\r\n            resetBallPosition()\r\n\r\n        } else if (ballPong.posY > screenHeight + ballPong.size) {\r\n\r\n            loseLife()\r\n            resetBallPosition()\r\n\r\n\r\n        } else if (ballPong.posX < 0) {\r\n//            scorePlayerBottom = 0\r\n//            scorePlayerTop = 0\r\n\r\n            score = 0\r\n\r\n        }\r\n        if (checkWinCondition() == true) {\r\n            stop()\r\n        }\r\n\r\n//        detta behöver vi om vi ska ha en maxpoäng (ändra bara 11an i if satsen till önskat maxpoäng)\r\n//        if (score >= 11) {\r\n//\r\n//            try {\r\n//                Thread.sleep(5000)\r\n//            } catch (e: InterruptedException) {\r\n//                e.printStackTrace()\r\n//            }\r\n//            score = 0\r\n//            scorePlayerBottom = 0\r\n//            scorePlayerTop = 0\r\n//    }\r\n        resetBallPosition()\r\n    }\r\n\r\n\r\n    private fun checkWinCondition(): Boolean {\r\n        return blockList.isEmpty()\r\n    }\r\n\r\n    private fun resetBallPosition() {\r\n        // Placera bollen på olika startpositioner beroende på var den åker ut\r\n\r\n        if (ballPong.posY < -ballPong.size) {\r\n            Thread.sleep(0)\r\n            ballPong.posX = initialBallPosXForTop\r\n            ballPong.posY = initialBallPosYForTop\r\n        } else if (ballPong.posY > screenHeight - ballPong.size) {\r\n            Thread.sleep(0)\r\n            ballPong.posX = initialBallPosXForBottom\r\n            ballPong.posY = initialBallPosYForBottom\r\n        }\r\n    }\r\n\r\n\r\n    override fun run() {\r\n        while (running) {\r\n            update()\r\n            drawGameBounds(holder)\r\n            ballPong.checkBounds(bounds)\r\n\r\n        }\r\n    }\r\n\r\n    override fun surfaceCreated(holder: SurfaceHolder) {\r\n        val blockWidth = 180f\r\n        val blockHeight = 50f\r\n        val centerX = (width / 2) - (blockWidth / 2)\r\n        val centerY = (height / 2) - (blockHeight / 2)\r\n        setup()\r\n\r\n        // Column positions\r\n        columnBlockPosition(centerX - 400f)\r\n        columnBlockPosition(centerX - 200f)\r\n        columnBlockPosition(centerX)\r\n        columnBlockPosition(centerX + 200f)\r\n        columnBlockPosition(centerX + 400f)\r\n\r\n        // Row positions\r\n        rowBlockPosition(centerY - 140f)\r\n        rowBlockPosition(centerY - 70f)\r\n        rowBlockPosition(centerY)\r\n        rowBlockPosition(centerY + 70f)\r\n        rowBlockPosition(centerY + 140f)\r\n\r\n        buildBreakoutBlocks()\r\n    }\r\n\r\n    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {\r\n        leftBoundaryPath = createBoundaryPathLeft(width, height)\r\n        rightBoundaryPath = createBoundaryPathRight(width, height)\r\n        bounds = Rect(0, 0, width, height)\r\n        start()\r\n\r\n    }\r\n\r\n    override fun surfaceDestroyed(holder: SurfaceHolder) {\r\n        stop()\r\n    }\r\n\r\n    private fun columnBlockPosition(xPosition: Float) {\r\n        xPositionList.add(xPosition)\r\n    }\r\n\r\n    private fun rowBlockPosition(yPosition: Float) {\r\n        yPositionList.add(yPosition)\r\n    }\r\n\r\n    private fun deleteBlockInList(block: BreakoutBlock) {\r\n        blockList.remove(block)\r\n    }\r\n\r\n    private fun addBlockInList(block: BreakoutBlock) {\r\n        blockList.add(block)\r\n    }\r\n\r\n\r\n    // Adding blocks in list in rows and columns\r\n    private fun buildBreakoutBlocks() {\r\n        var randomBitmap = Random.nextInt(0, 3)\r\n        val blockWidth = 175f\r\n        val blockHeight = 50f\r\n\r\n        for (y in yPositionList) {\r\n            for (x in xPositionList) {\r\n                addBlockInList(\r\n                    BreakoutBlock(\r\n                        this.context, x, y, x + blockWidth, y + blockHeight,\r\n                        randomBitmap\r\n                    )\r\n                )\r\n                randomBitmap = Random.nextInt(0, 3)\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun checkBallBlockCollision() {\r\n        for (block in blockList) {\r\n            if (onBlockCollision(block, ballPong)) {\r\n                ballPong.speedY *= -1\r\n                score++\r\n                deleteBlockInList(block)\r\n                break\r\n            }\r\n        }\r\n    }\r\n\r\n\r\n    private fun onBlockCollision(block: BreakoutBlock, ball: BallPong): Boolean {\r\n        // CommonX sparar bollens x-position om den befinner sig inom blockets x-position\r\n        val commonX = if (ball.posX < block.posX) {\r\n            block.posX\r\n        } else if (ball.posX > block.width) {\r\n            block.width\r\n        } else {\r\n            ball.posX\r\n        }\r\n\r\n        // CommonY sparar bollens y-position om den befinner sig inom blockets y-position\r\n        val commonY = if (ball.posY < block.posY) {\r\n            block.posY\r\n        } else if (ball.posY > block.height) {\r\n            block.height\r\n        } else {\r\n            ball.posY\r\n        }\r\n\r\n        // Här räknas distansen ut. Exempel, om bollens x-position är 50 och commonX\r\n        // är samma, dvs. 50 så blir x-distansens 0. Samma gäller för Y.\r\n        val distance =\r\n            sqrt(\r\n                (ball.posX - commonX).toDouble().pow(2.0) + (ball.posY - commonY).toDouble()\r\n                    .pow(2.0)\r\n            )\r\n\r\n        // Returnerar true när distansen är 0 och drar bort bollens size.\r\n        return distance < ball.size\r\n\r\n    }\r\n\r\n    fun drawGameBounds(holder: SurfaceHolder) {\r\n        val canvas: Canvas? = holder.lockCanvas()\r\n\r\n        canvas?.drawColor(Color.BLACK)\r\n\r\n        val livesText = \"Lives: $lives\"\r\n        canvas?.drawText(livesText, 20f, 100f, scorePaint)\r\n\r\n        if (isGameOver)\r\n            canvas?.drawText(\r\n                \"GAME OVER\",\r\n                canvas.width.toFloat() / 3,\r\n                canvas.height.toFloat() - 300,\r\n                textGameOverPaint\r\n            )\r\n\r\n        rightBoundaryPath?.let {\r\n\r\n            canvas?.drawPath(it, lineColor)\r\n            if (ballPong.posY < 0 - ballPong.size) {\r\n                canvas?.drawPath(it, touchColor)\r\n                canvas?.drawText(\r\n                    \"Score: $score\",\r\n                    canvas.width.toFloat() - 400,\r\n                    0f + 100,\r\n                    textGameOverPaint\r\n                )\r\n\r\n\r\n            } else {\r\n                // Placera text\r\n                canvas?.drawText(\r\n                    \"Score: $score\",\r\n                    canvas.width.toFloat() - 400,\r\n                    0f + 100,\r\n                    scorePaint\r\n                )\r\n            }\r\n\r\n        }\r\n\r\n        leftBoundaryPath?.let {\r\n            canvas?.drawPath(it, lineColor)\r\n\r\n        }\r\n\r\n        // Draw the paddles\r\n        paddle.draw(canvas!!)\r\n        topPaddle.draw(canvas)\r\n\r\n        //Draw all blocks\r\n        for (block in blockList) {\r\n            block.draw(canvas)\r\n        }\r\n\r\n\r\n        ballPong.draw(canvas)\r\n        holder.unlockCanvasAndPost(canvas)\r\n    }\r\n\r\n    private fun isBallCollidingWithPaddle(ball: BallPong, paddle: PaddlePong): Boolean {\r\n        // Check if the ball is within the horizontal bounds of the paddle\r\n        val horizontalCollision = ball.posX + ball.size > paddle.positionX - paddle.width / 2 &&\r\n                ball.posX - ball.size < paddle.positionX + paddle.width / 2\r\n\r\n        // Check if the ball is within the vertical bounds of the paddle\r\n        val verticalCollision = ball.posY + ball.size > paddle.positionY - paddle.height / 2 &&\r\n                ball.posY - ball.size < paddle.positionY + paddle.height / 2\r\n\r\n        return horizontalCollision && verticalCollision\r\n    }\r\n\r\n    //     Enbart spelplan med linje för syns skull, vänster sidolinje.\r\n    private fun createBoundaryPathLeft(width: Int, height: Int): Path {\r\n        val pathLeft = Path()\r\n\r\n        pathLeft.moveTo(0f, 0f)\r\n        pathLeft.lineTo(0f, height.toFloat())\r\n\r\n        return pathLeft\r\n    }\r\n\r\n    // Enbart spelplan med linje för syns skull, höger sidolinje.\r\n    private fun createBoundaryPathRight(width: Int, height: Int): Path {\r\n        val pathRight = Path()\r\n\r\n        pathRight.moveTo(width.toFloat(), 0f)\r\n        pathRight.lineTo(width.toFloat(), height.toFloat())\r\n\r\n        return pathRight\r\n    }\r\n}\r\n//    private fun updateScore(): Int {\r\n//        score++\r\n//        return score\r\n//    }\r\n//    private fun updateScoreTop(): Int {\r\n//        scorePlayerTop++\r\n//        return scorePlayerTop\r\n//    }\r\n//\r\n//    private fun updateScoreBottom(): Int {\r\n//        scorePlayerBottom++\r\n//        return scorePlayerBottom\r\n//    }\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/racoonsquash/PongGameView.kt b/app/src/main/java/com/example/racoonsquash/PongGameView.kt
+--- a/app/src/main/java/com/example/racoonsquash/PongGameView.kt	(revision 625957b3a3fb02900b5827b8ecab8dd487bccd84)
++++ b/app/src/main/java/com/example/racoonsquash/PongGameView.kt	(date 1704273674157)
+@@ -15,41 +15,59 @@
+ import android.view.MotionEvent
+ 
+ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
++    //    private var scorePlayerTop = 0
++    //    private var scorePlayerBottom = 0
+     var thread: Thread? = null
+     var running = false
++    var bounds = Rect()
++    var mHolder: SurfaceHolder? = holder
++
++    // Variabler för rita upp de olika delarna i surfaceView
+     var lineColor: Paint
+-    private var leftBoundaryPath: Path? = null
+-    private var rightBoundaryPath: Path? = null
+     var touchColor: Paint
+     var scorePaint: Paint
+-
++    var gameWonPaint: Paint
+     private var textGameOverPaint: Paint
++    lateinit var ballPong: BallPong
++    private var leftBoundaryPath: Path? = null
++    private var rightBoundaryPath: Path? = null
++
++    // variabler för kolla om man vunnit eller förlorat spelet.
++    var isGameWon = false
++    var isGameOver = false
+ 
+-    //    private var scorePlayerTop = 0
+-//    private var scorePlayerBottom = 0
++    // Antal poäng som man börjar med
++    private var score = 0
++
++    // Antal Liv som man börjar med
++    private var lives = 3
++
++    //dessa 3 hanterar blockens position
+     private val blockList: MutableList<BreakoutBlock> = mutableListOf()
+     private val xPositionList: MutableList<Float> = mutableListOf()
+     private val yPositionList: MutableList<Float> = mutableListOf()
+-    lateinit var ballPong: BallPong
+-    var bounds = Rect()
+-    var mHolder: SurfaceHolder? = holder
+ 
+-    //    private val initialBallPosX = 500f
+-//    private val initialBallPosY = 700f
+-    var isGameOver = false
+-    private var score = 0
++    //dessa 2 hanterar paddlarna.
+     private lateinit var paddle: PaddlePong
+     private lateinit var topPaddle: PaddlePong
++
++    //dessa 2 hanterar vart bollen kommer tillbaka när den åker ut på toppen av skärmen
+     private val initialBallPosXForTop = 500f
+     private val initialBallPosYForTop = 1300f
++
++    // dessa 2 hanterar vart bollen kommer tillbaka när den åker ut på botten av skärmen
+     private val initialBallPosXForBottom = 300f
+     private val initialBallPosYForBottom = 500f
+-    private var lives = 3// Antal liv
+ 
+     init {
+         if (mHolder != null) {
+             mHolder?.addCallback(this)
+         }
++        gameWonPaint = Paint().apply {
++            color = Color.RED
++            style = Paint.Style.STROKE
++            strokeWidth = 50f
++        }
+ 
+         lineColor = Paint().apply {
+             color = Color.CYAN
+@@ -79,6 +97,7 @@
+                 style = Paint.Style.STROKE
+                 strokeWidth = 50f
+             }
++
+         }
+         setup()
+     }
+@@ -87,7 +106,8 @@
+     private val screenHeight = resources.displayMetrics.heightPixels
+ 
+     private fun setup() {
+-        ballPong = CustomPongBall(context, 100f, 100f, 30f, 10f, 10f, 0)
++        ballPong = CustomPongBall(context, 100f, 100f, 30f, 25f, 25f, 0)
++
+         paddle = PaddlePong(
+             context,
+             screenWidth / 2f,
+@@ -147,13 +167,12 @@
+         }
+     }
+ 
+-
+     private fun loseLife() {
+         lives--
+-        if(lives<=0){
+-            isGameOver =true
++        if (lives <= 0) {
++            isGameOver = true
+         }
+-            }
++    }
+ 
+ 
+     fun update() {
+@@ -166,6 +185,9 @@
+ 
+             stop()
+ 
++        }
++        if (checkWinCondition()) {
++            stop()
+         }
+         // Check collision with the bottom paddle
+         if (isBallCollidingWithPaddle(ballPong, paddle)) {
+@@ -179,13 +201,13 @@
+ 
+ 
+         if (ballPong.posY < -ballPong.size) {
+-            loseLife()
++//            loseLife()
+ 
+             resetBallPosition()
+ 
+         } else if (ballPong.posY > screenHeight + ballPong.size) {
+ 
+-            loseLife()
++//            loseLife()
+             resetBallPosition()
+ 
+ 
+@@ -196,9 +218,7 @@
+             score = 0
+ 
+         }
+-        if (checkWinCondition() == true) {
+-            stop()
+-        }
++
+ 
+ //        detta behöver vi om vi ska ha en maxpoäng (ändra bara 11an i if satsen till önskat maxpoäng)
+ //        if (score >= 11) {
+@@ -217,7 +237,9 @@
+ 
+ 
+     private fun checkWinCondition(): Boolean {
++
+         return blockList.isEmpty()
++
+     }
+ 
+     private fun resetBallPosition() {
+@@ -363,11 +385,19 @@
+     fun drawGameBounds(holder: SurfaceHolder) {
+         val canvas: Canvas? = holder.lockCanvas()
+ 
++        val winText = "YOU WON!$isGameWon"
+         canvas?.drawColor(Color.BLACK)
+ 
+         val livesText = "Lives: $lives"
+         canvas?.drawText(livesText, 20f, 100f, scorePaint)
+ 
++        if (checkWinCondition() == true)
++            canvas?.drawText(
++                "winText",
++                canvas.width.toFloat() / 3,
++                canvas.height.toFloat() - 1300,
++                gameWonPaint
++            )
+         if (isGameOver)
+             canvas?.drawText(
+                 "GAME OVER",
+@@ -452,10 +482,7 @@
+         return pathRight
+     }
+ }
+-//    private fun updateScore(): Int {
+-//        score++
+-//        return score
+-//    }
++//Lägg till för 2 spelar läge.
+ //    private fun updateScoreTop(): Int {
+ //        scorePlayerTop++
+ //        return scorePlayerTop
+Index: app/src/main/java/com/example/racoonsquash/BallSquash.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.racoonsquash\r\n\r\nimport android.content.Context\r\nimport android.graphics.Canvas\r\nimport android.graphics.Paint\r\nimport android.graphics.Rect\r\n\r\n\r\nopen class BallSquash(\r\n    context: Context,\r\n    var posX: Float,\r\n    var posY: Float,\r\n    var size: Float,\r\n    var speedX: Float,\r\n    var speedY: Float,\r\n    color: Int,\r\n    var speed: Float\r\n) {\r\n    var paint = Paint()\r\n\r\n    init {\r\n        paint.color = color\r\n    }\r\n\r\n    \r\n    fun checkBounds(bounds: Rect) {\r\n        // Kolla vänster och höger vägg\r\n        if (posX + size > bounds.right) {\r\n            speedX *= -1\r\n            if (posX + size > bounds.right) {\r\n                posX = bounds.right - size\r\n            }\r\n        }\r\n\r\n         // Kolla övre och nedre vägg\r\n            if (posY - size < bounds.top || posY + size > bounds.bottom) {\r\n                speedY *= -1\r\n                if (posY - size < bounds.top) {\r\n                posY = bounds.top + size\r\n            } else if (posY + size > bounds.bottom) {\r\n                posY = bounds.bottom - size\r\n            }\r\n        }\r\n    }\r\n//    posY = posY + speed // bollar som aker nerat pa vanster sidan\r\n//    posX += speed //diagonalt akande bollar\r\n    fun update() {\r\n\r\n        posX += speedX\r\n        posY += speedY\r\n\r\n    }\r\n\r\n    open fun draw(canvas: Canvas?) {\r\n        canvas?.drawCircle(posX, posY, size, paint)\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/racoonsquash/BallSquash.kt b/app/src/main/java/com/example/racoonsquash/BallSquash.kt
+--- a/app/src/main/java/com/example/racoonsquash/BallSquash.kt	(revision 625957b3a3fb02900b5827b8ecab8dd487bccd84)
++++ b/app/src/main/java/com/example/racoonsquash/BallSquash.kt	(date 1704198392647)
+@@ -5,7 +5,6 @@
+ import android.graphics.Paint
+ import android.graphics.Rect
+ 
+-
+ open class BallSquash(
+     context: Context,
+     var posX: Float,
+@@ -22,7 +21,6 @@
+         paint.color = color
+     }
+ 
+-    
+     fun checkBounds(bounds: Rect) {
+         // Kolla vänster och höger vägg
+         if (posX + size > bounds.right) {
+Index: app/src/main/java/com/example/racoonsquash/SquashGameView.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.racoonsquash\r\n\r\nimport android.annotation.SuppressLint\r\nimport android.content.Context\r\nimport android.graphics.Canvas\r\nimport android.graphics.Color\r\nimport android.graphics.Paint\r\nimport android.graphics.Path\r\nimport android.graphics.Rect\r\nimport android.graphics.Typeface\r\nimport android.view.MotionEvent\r\nimport android.view.SurfaceHolder\r\nimport android.view.SurfaceView\r\n\r\n\r\nclass SquashGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {\r\n    private var thread: Thread? = null\r\n    private var running = false\r\n    lateinit var ballSquash: BallSquash\r\n    lateinit var squashPad: SquashPad\r\n    private var lineColor: Paint\r\n    private var touchColor: Paint\r\n    private var scorePaint: Paint\r\n    private var textGameOverPaint: Paint\r\n    private var score: Int = 0;\r\n    private var isPaused = false\r\n\r\n\r\n\r\n    //Path-klass ritar ett \"spår\" från en punkt moveTo() till nästa punkt lineTo()\r\n    private var gameBoundaryPath: Path? = null\r\n\r\n    var bounds = Rect() //for att kunna studsa m vaggarna\r\n    var mHolder: SurfaceHolder? = holder\r\n\r\n    private var buttonPauseRect :Rect? = null\r\n    private val buttonPausePaint = Paint().apply {\r\n        //This could be transparent if no rectangle is wanted to be shown\r\n        color = Color.YELLOW\r\n        alpha = 100\r\n    }\r\n    private val buttonPauseTextPaint = Paint().apply {\r\n        color = Color.WHITE\r\n        textSize = 60.0F\r\n        typeface = Typeface.create(\"serif-monospace\", Typeface.BOLD)\r\n    }\r\n    private var buttonPauseText = context.getString(R.string.pauseText)\r\n\r\n    init {\r\n        if (mHolder != null) {\r\n            mHolder?.addCallback(this)\r\n        }\r\n\r\n        // Score-text-färg-attribut\r\n        scorePaint = Paint().apply {\r\n            color = Color.GREEN\r\n            alpha = 200\r\n            textSize = 60.0F\r\n            typeface = Typeface.create(\"serif-monospace\", Typeface.BOLD)\r\n        }\r\n        textGameOverPaint = Paint().apply {\r\n            color = Color.RED\r\n            alpha = 200\r\n            textSize = 60.0F\r\n            typeface = Typeface.create(\"serif-monospace\", Typeface.BOLD)\r\n        }\r\n        // Enbart för att synliggöra gränserna\r\n        lineColor = Paint().apply {\r\n            color = Color.MAGENTA\r\n            style = Paint.Style.STROKE\r\n            strokeWidth = 10f\r\n        }\r\n        touchColor = Paint().apply {\r\n            color = Color.RED\r\n            style = Paint.Style.STROKE\r\n            strokeWidth = 50f\r\n        }\r\n        setup()\r\n    }\r\n\r\n    @SuppressLint(\"UseCompatLoadingForDrawables\")\r\n    private fun setup() {\r\n\r\n        ballSquash = BallSquash(this.context, 100f, 100f, 30f, 20f, 20f, Color.RED, 20f)\r\n\r\n       // val drawablePaddle = resources.getDrawable(R.drawable.player_pad_a, null)\r\n        squashPad = SquashPad(\r\n            this.context, 50f, 400f, 6f, 0f, 0f, 0,\r\n            15f, 75f, 0f\r\n        )\r\n    }\r\n\r\n    fun start() {\r\n        running = true\r\n        thread =\r\n            Thread(this) //en trad har en konstruktor som tar in en runnable,\r\n        // vilket sker i denna klass se rad 10\r\n        thread?.start()\r\n\r\n    }\r\n\r\n    fun stop() {\r\n        running = false\r\n        try {\r\n            thread?.join() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv\r\n        } catch (e: InterruptedException) {\r\n            e.printStackTrace()\r\n        }\r\n    }\r\n\r\n    fun update() {\r\n        ballIntersects(ballSquash, squashPad)\r\n        ballSquash.update()\r\n        // Räknar bara när boll rör långsidan just nu\r\n        if (ballSquash.posX > width - ballSquash.size) {\r\n            updateScore()\r\n        }\r\n    }\r\n\r\n    override fun run() {\r\n        while (running) {\r\n            if (!isPaused) {\r\n                try {\r\n                    update()\r\n                    drawGameBounds(holder)\r\n                    ballSquash.checkBounds(bounds)\r\n                } catch (e: Exception) {\r\n                    e.printStackTrace()\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    //med denna kod kan jag rora pa boll2 som star stilla annars\r\n    @SuppressLint(\"ClickableViewAccessibility\")\r\n    override fun onTouchEvent(event: MotionEvent?): Boolean {\r\n         if (event != null) {\r\n            val x = event.x.toInt()\r\n            val y = event.y.toInt()\r\n            if (!isInsidePauseRectangule(x, y)) {\r\n                // User is not clicking on pause\r\n                squashPad.posY = event.y // Move pad\r\n            } else if (isInsidePauseRectangule(x, y) && event.action == MotionEvent.ACTION_DOWN) {\r\n                // User is clicking on Pause\r\n                buttonPauseText = if (isPaused) context.getString(R.string.pauseText)\r\n                                    else context.getString(R.string.resumeText)\r\n                isPaused = !isPaused\r\n                drawGameBounds(holder)\r\n            }\r\n            return true\r\n        }\r\n        return super.onTouchEvent(event)\r\n    }\r\n\r\n    private fun isInsidePauseRectangule(x: Int, y: Int) = buttonPauseRect!!.contains(x, y)\r\n\r\n//onBallCollision inverterar riktningen på bollen när den träffar squashPad\r\n// denna funktionen beräknar avstånd från bollens Y position och padelns Y position för att\r\n// bestämma vart på padeln som bollen träffar.\r\n// sen bestäms studsriktningen beroende på vart på padeln kollisionen sker\r\n// sen så räknas vinkeln genom multiplicera normaliserade värdet.\r\n    fun onBallCollision(ballSquash1: BallSquash, squashPad: SquashPad) {\r\n\r\n        val relativeIntersectY = squashPad.posY - ballSquash1.posY\r\n        val normalizedIntersectY = (relativeIntersectY / (squashPad.height / 2)).coerceIn(-1f, 1f)\r\n        val bounceAngle =\r\n            normalizedIntersectY * Math.PI / 7\r\n\r\n        ballSquash1.speedX = (ballSquash1.speed * Math.cos(bounceAngle)).toFloat()\r\n        ballSquash1.speedY = (-ballSquash1.speed * Math.sin(bounceAngle)).toFloat()\r\n    }\r\n\r\n    // här tar vi in storlek från ball och squashPad och kontrollerar när en kollision sker\r\n    fun ballIntersects(ballSquash1: BallSquash, squashPad: SquashPad) {\r\n        val padLeft = squashPad.posX - squashPad.width\r\n        val padRight = squashPad.posX + squashPad.width\r\n        val padTop = squashPad.posY - squashPad.height\r\n        val padBottom = squashPad.posY + squashPad.height\r\n        val ballLeft = ballSquash1.posX - ballSquash1.size\r\n        val ballRight = ballSquash1.posX + ballSquash1.size\r\n        val ballTop = ballSquash1.posY - ballSquash1.size\r\n        val ballBottom = ballSquash1.posY + ballSquash1.size\r\n\r\n        if (ballRight >= padLeft && ballLeft <= padRight && ballBottom >= padTop && ballTop <=\r\n            padBottom\r\n        ) {\r\n            onBallCollision(ballSquash1, squashPad)\r\n        }\r\n    }\r\n\r\n\r\n    //dessa startar och stoppar min thread:\r\n    override fun surfaceCreated(holder: SurfaceHolder) {\r\n    }\r\n\r\n    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {\r\n        gameBoundaryPath = createBoundaryPath(width, height)\r\n        bounds = Rect(0, 0, width, height)\r\n        start()\r\n    }\r\n\r\n    override fun surfaceDestroyed(holder: SurfaceHolder) {\r\n        stop()\r\n    }\r\n\r\n    //run/metoden ar en metod som vi fick fran interface Runnable och ar kopplat till dess Thread.\r\n    // Run anropas nar vi kor Thread.start()\r\n    //den kor en while loop med vår running variable och anropar update och draw:\r\n\r\n\r\n    fun drawGameBounds(holder: SurfaceHolder) {\r\n        val canvas: Canvas? = holder.lockCanvas()\r\n        canvas?.drawColor(Color.BLACK)\r\n\r\n        gameBoundaryPath?.let {\r\n            canvas?.drawPath(it, lineColor)\r\n\r\n            if (isGameOver()) {\r\n                //user loses\r\n\r\n                canvas?.drawPath(it, touchColor)\r\n                canvas?.drawText(\r\n                    \"Score: $score\",\r\n                    canvas.width.toFloat() - 400,\r\n                    0f + 100,\r\n                    textGameOverPaint\r\n                )\r\n                canvas?.drawText(\r\n                    \"GAME OVER\",\r\n                    canvas.width.toFloat() / 3,\r\n                    canvas.height.toFloat() / 2,\r\n                    textGameOverPaint\r\n                )\r\n\r\n                // Save score\r\n                val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)\r\n                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.SQUASH))\r\n            } else {\r\n                // Placera text\r\n                canvas?.drawText(\r\n                    \"Score: $score\",\r\n                    canvas.width.toFloat() - 400,\r\n                    0f + 100,\r\n                    scorePaint\r\n                )\r\n            }\r\n        }\r\n\r\n\r\n        ballSquash.draw(canvas)\r\n        squashPad.draw(canvas)\r\n\r\n        //Draw pause button\r\n        if (canvas != null) {\r\n            val buttonPauseTextLength = buttonPauseTextPaint.measureText(buttonPauseText)\r\n            buttonPauseRect = Rect(\r\n                (canvas.width.toFloat() - 650f).toInt(),\r\n                0 + 50,\r\n                (canvas.width.toFloat() - 650f + buttonPauseTextLength + 10).toInt(),\r\n                50 + textGameOverPaint.textSize.toInt()\r\n            ) // x-start, y-start, x-end, y-end\r\n\r\n            canvas.drawRect(buttonPauseRect!!, buttonPausePaint)\r\n            canvas.drawText(\r\n                buttonPauseText,\r\n                buttonPauseRect!!.left.toFloat() + 5,\r\n                buttonPauseRect!!.top.toFloat() + buttonPauseTextPaint.textSize - 10,\r\n                buttonPauseTextPaint\r\n            )\r\n        }\r\n        holder.unlockCanvasAndPost(canvas)\r\n    }\r\n\r\n    private fun isGameOver() = ballSquash.posX < 0 - ballSquash.size\r\n\r\n    // För syns skull gör en Path med färgade linjer för gränserna.\r\n    private fun createBoundaryPath(width: Int, height: Int): Path {\r\n        val path = Path()\r\n        path.moveTo(0f, 0f)\r\n        path.lineTo(width.toFloat(), 0f)\r\n        path.lineTo(width.toFloat(), height.toFloat())\r\n        path.lineTo(0f, height.toFloat())\r\n        return path\r\n    }\r\n\r\n    private fun updateScore(): Int {\r\n        score++\r\n        return score\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/racoonsquash/SquashGameView.kt b/app/src/main/java/com/example/racoonsquash/SquashGameView.kt
+--- a/app/src/main/java/com/example/racoonsquash/SquashGameView.kt	(revision 625957b3a3fb02900b5827b8ecab8dd487bccd84)
++++ b/app/src/main/java/com/example/racoonsquash/SquashGameView.kt	(date 1704204509062)
+@@ -83,7 +83,7 @@
+ 
+         ballSquash = BallSquash(this.context, 100f, 100f, 30f, 20f, 20f, Color.RED, 20f)
+ 
+-       // val drawablePaddle = resources.getDrawable(R.drawable.player_pad_a, null)
++
+         squashPad = SquashPad(
+             this.context, 50f, 400f, 6f, 0f, 0f, 0,
+             15f, 75f, 0f
+Index: .idea/deploymentTargetDropDown.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"deploymentTargetDropDown\">\r\n    <targetSelectedWithDropDown>\r\n      <Target>\r\n        <type value=\"QUICK_BOOT_TARGET\" />\r\n        <deviceKey>\r\n          <Key>\r\n            <type value=\"VIRTUAL_DEVICE_PATH\" />\r\n            <value value=\"C:\\Users\\Joaki\\.android\\avd\\Pixel_2_API_34.avd\" />\r\n          </Key>\r\n        </deviceKey>\r\n      </Target>\r\n    </targetSelectedWithDropDown>\r\n    <timeTargetWasSelectedWithDropDown value=\"2023-12-22T09:15:23.127108700Z\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetDropDown.xml b/.idea/deploymentTargetDropDown.xml
+--- a/.idea/deploymentTargetDropDown.xml	(revision 625957b3a3fb02900b5827b8ecab8dd487bccd84)
++++ b/.idea/deploymentTargetDropDown.xml	(date 1704203788491)
+@@ -7,11 +7,11 @@
+         <deviceKey>
+           <Key>
+             <type value="VIRTUAL_DEVICE_PATH" />
+-            <value value="C:\Users\Joaki\.android\avd\Pixel_2_API_34.avd" />
++            <value value="C:\Users\Joaki\.android\avd\Pixel_3a_XL_API_34.avd" />
+           </Key>
+         </deviceKey>
+       </Target>
+     </targetSelectedWithDropDown>
+-    <timeTargetWasSelectedWithDropDown value="2023-12-22T09:15:23.127108700Z" />
++    <timeTargetWasSelectedWithDropDown value="2024-01-02T13:55:00.785694800Z" />
+   </component>
+ </project>
+\ No newline at end of file

@@ -23,6 +23,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     var touchColor: Paint
     var scorePaint: Paint
 
+    var isGameOver = false
+    var isGameWon = false
+    lateinit var gameWonPaint: Paint
     private var textGameOverPaint: Paint
 
     //    private var scorePlayerTop = 0
@@ -43,7 +46,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val initialBallPosYForTop = 1300f
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
-    private var lives = 1007 // Antal liv
+    private var lives = 3 // Antal liv
+
 
     init {
         if (mHolder != null) {
@@ -86,7 +90,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
-        ballPong = CustomPongBall(context, 100f, 100f, 30f, 10f, 10f, 0)
+        ballPong = CustomPongBall(context, 100f, 100f, 30f, 15f, 15f, 0)
         paddle = PaddlePong(
             context,
             screenWidth / 2f,
@@ -149,10 +153,11 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     private fun loseLife() {
         lives--
-        if (lives <= 0) {
-            stop()
+        if(lives<=0){
+            isGameOver =true
         }
     }
+
 
     fun update() {
         checkWinCondition()
@@ -161,7 +166,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         paddle.update()
         topPaddle.update()
         val screenHeight = height // Höjden på skärmen
-
+        if (lives <= 0) {
+            stop()
+        }
         // Check collision with the bottom paddle
         if (isBallCollidingWithPaddle(ballPong, paddle)) {
             ballPong.speedY = -ballPong.speedY // Reverse Y-direction
@@ -222,7 +229,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             Thread.sleep(0)
             ballPong.posX = initialBallPosXForTop
             ballPong.posY = initialBallPosYForTop
-        } else if (ballPong.posY > screenHeight + ballPong.size) {
+        } else if (ballPong.posY > screenHeight - ballPong.size) {
             Thread.sleep(0)
             ballPong.posX = initialBallPosXForBottom
             ballPong.posY = initialBallPosYForBottom
@@ -364,6 +371,22 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         canvas?.drawText(livesText, 20f, 100f, scorePaint)
 
         rightBoundaryPath?.let {
+            if (checkWinCondition())
+                canvas?.drawText(
+                    "winText",
+                    canvas.width.toFloat() / 3,
+                    canvas.height.toFloat() - 300,
+                    gameWonPaint
+                )
+
+
+            if (isGameOver)
+                canvas?.drawText(
+                    "GAME OVER",
+                    canvas.width.toFloat() / 3,
+                    canvas.height.toFloat() - 300,
+                    textGameOverPaint
+                )
 
             canvas?.drawPath(it, lineColor)
             if (ballPong.posY < 0 - ballPong.size) {
@@ -392,6 +415,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                     canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
+            if(isGameWon)
+                canvas?.drawText("CONGRATZ",canvas.width.toFloat() / 3,
+                    canvas.height.toFloat() - 300,gameWonPaint)
         }
 
         leftBoundaryPath?.let {
