@@ -5,25 +5,22 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 
-
-open class BallSquash(
+class BallSquash(
     context: Context,
-    var posX: Float,
-    var posY: Float,
-    var size: Float,
-    var speedX: Float,
-    var speedY: Float,
+    posX: Float,
+    posY: Float,
+    size: Float,
+    speedX: Float,
+    speedY: Float,
     color: Int,
     var speed: Float
-) {
-    var paint = Paint()
+) : Ball(context, posX, posY, size, speedX, speedY, color) {
 
     init {
         paint.color = color
     }
 
-    
-    fun checkBounds(bounds: Rect) {
+    override fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
         if (posX + size > bounds.right) {
             speedX *= -1
@@ -32,26 +29,18 @@ open class BallSquash(
             }
         }
 
-         // Kolla övre och nedre vägg
-            if (posY - size < bounds.top || posY + size > bounds.bottom) {
-                speedY *= -1
-                if (posY - size < bounds.top) {
+        // Kolla övre och nedre vägg
+        if (posY - size < bounds.top || posY + size > bounds.bottom) {
+            speedY *= -1
+            if (posY - size < bounds.top) {
                 posY = bounds.top + size
             } else if (posY + size > bounds.bottom) {
                 posY = bounds.bottom - size
             }
         }
     }
-//    posY = posY + speed // bollar som aker nerat pa vanster sidan
-//    posX += speed //diagonalt akande bollar
-    fun update() {
 
-        posX += speedX
-        posY += speedY
-
-    }
-
-    open fun draw(canvas: Canvas?) {
+    override fun draw(canvas: Canvas?) {
         canvas?.drawCircle(posX, posY, size, paint)
     }
 

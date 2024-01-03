@@ -84,7 +84,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
-        ballPong = CustomPongBall(context, 100f, 100f, 30f, 10f, 10f, 0)
+        ballPong = BallPong(context, 100f, 100f, 30f, 10f, 10f, 0)
         paddle = PaddlePong(
             context,
             screenWidth / 2f,

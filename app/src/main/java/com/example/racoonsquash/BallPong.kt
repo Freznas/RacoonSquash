@@ -1,32 +1,39 @@
 package com.example.racoonsquash
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.Rect
 
-
-open class BallPong(
+class BallPong(
     context: Context,
-    var posX: Float,
-    var posY: Float,
-    var size: Float,
-    var speedX: Float,
-    var speedY: Float,
-    color: Int,
+    posX: Float,
+    posY: Float,
+    size: Float,
+    speedX: Float,
+    speedY: Float,
+    color: Int
+) : Ball(context, posX, posY, size, speedX, speedY, color) {
 
-    ) {
-    private val soundEffect =  SoundEffect(context)
-    var paint = Paint()
+    private var bitmap: Bitmap
 
     init {
-        paint.color = color
+
+        val smallerSize = BitmapFactory.Options()
+        smallerSize.inSampleSize = 14
+
+        bitmap = BitmapFactory.decodeResource(
+            context.resources,
+            R.drawable.custom_pongball_green,
+            smallerSize
+        )
+
     }
 
-    fun checkBounds(bounds: Rect) {
+    override fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
         if (posX - size < bounds.left || posX + size > bounds.right) {
-            soundEffect.play(1)
             speedX *= -1
             if (posX - size < bounds.left) {
                 posX = bounds.left + size
@@ -34,17 +41,14 @@ open class BallPong(
                 posX = bounds.right - size
             }
         }
-    }
-
-
-    open fun update() {
-
-        posX += speedX
-        posY += speedY
 
     }
 
-    open fun draw(canvas: Canvas?) {
-        canvas?.drawCircle(posX, posY, size, paint)
+    override fun draw(canvas: Canvas?) {
+        val centerX = posX - bitmap.width / 2
+        val centerY = posY - bitmap.height / 2
+
+        canvas?.drawBitmap(bitmap, centerX, centerY, null)
+
     }
 }
