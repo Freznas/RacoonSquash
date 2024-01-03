@@ -17,6 +17,7 @@ class BallPong(
 ) : Ball(context, posX, posY, size, speedX, speedY, color) {
 
     private var bitmap: Bitmap
+    private val soundEffect: SoundEffect = SoundEffect(context)
 
     init {
 
@@ -34,6 +35,7 @@ class BallPong(
     override fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
         if (posX - size < bounds.left || posX + size > bounds.right) {
+            soundEffect.play(1)
             speedX *= -1
             if (posX - size < bounds.left) {
                 posX = bounds.left + size
