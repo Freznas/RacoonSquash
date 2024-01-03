@@ -49,6 +49,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private var lives = 3 // Antal liv
 
 
+    private val soundEffect = SoundEffect(context)
+
     init {
         if (mHolder != null) {
             mHolder?.addCallback(this)
@@ -171,17 +173,23 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         }
         // Check collision with the bottom paddle
         if (isBallCollidingWithPaddle(ballPong, paddle)) {
+            soundEffect.play(0)
             ballPong.speedY = -ballPong.speedY // Reverse Y-direction
         }
 
         // Check collision with the top paddle
         if (isBallCollidingWithPaddle(ballPong, topPaddle)) {
+            soundEffect.play(0)
             ballPong.speedY = -ballPong.speedY // Reverse Y-direction
         }
 
 
         if (ballPong.posY < -ballPong.size) {
+
             loseLife()
+
+
+            soundEffect.play(2)
 
             resetBallPosition()
 
@@ -322,7 +330,11 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         for (block in blockList) {
             if (onBlockCollision(block, ballPong)) {
                 ballPong.speedY *= -1
+
                 score++
+
+                soundEffect.play(3)
+
                 deleteBlockInList(block)
                 break
             }
