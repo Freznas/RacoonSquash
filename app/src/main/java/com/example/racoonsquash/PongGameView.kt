@@ -13,6 +13,7 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
 import android.view.MotionEvent
+import android.widget.FrameLayout
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -98,7 +99,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         paddle = PaddlePong(
             context,
             screenWidth / 2f,
-            screenHeight - 100f,  // for bottom paddle
+            screenHeight - 220f,  // for bottom paddle (Had to change for the smaller size) // JH
             180f,
             20f,
             Color.parseColor("#FFFF00")
@@ -111,6 +112,15 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             20f,
             Color.parseColor("#FFFF00")
         )
+    }
+
+    private fun smallerSurfaceLayout(width: Int, height: Int) {
+        val layoutParams = FrameLayout.LayoutParams(
+            width,
+            height
+        )
+        layoutParams.topMargin = 120
+        setLayoutParams(layoutParams)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -158,6 +168,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private fun loseLife() {
         lives--
         if(lives<=0){
+            soundEffect.play(2)
             isGameOver =true
         }
     }
@@ -191,7 +202,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             loseLife()
 
 
-            soundEffect.play(2)
+
 
             resetBallPosition()
 
@@ -283,6 +294,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         leftBoundaryPath = createBoundaryPathLeft(width, height)
         rightBoundaryPath = createBoundaryPathRight(width, height)
+        smallerSurfaceLayout(width, height)
         bounds = Rect(0, 0, width, height)
         start()
 
