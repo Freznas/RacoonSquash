@@ -14,6 +14,8 @@ import kotlin.math.sqrt
 import kotlin.random.Random
 import android.view.MotionEvent
 import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.Toast
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -112,6 +114,12 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             20f,
             Color.parseColor("#FFFF00")
         )
+    }
+    fun setupButton(button: ImageButton) {
+        button.setOnClickListener {
+
+            // PAUSE GAME!!!!
+        }
     }
 
     private fun smallerSurfaceLayout(width: Int, height: Int) {

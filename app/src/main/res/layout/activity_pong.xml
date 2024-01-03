@@ -8,6 +8,7 @@
     tools:context=".PongActivity">
 
     <ImageButton
+        android:id="@+id/btn_play_pause_pong"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/small_play"
