@@ -22,7 +22,6 @@
 
     </LinearLayout>
 
-
     <SurfaceView
         android:id="@+id/sv_pong"
         android:layout_width="match_parent"
