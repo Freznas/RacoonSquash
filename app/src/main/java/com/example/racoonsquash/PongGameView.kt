@@ -506,6 +506,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         if (isGameWon) {
             stop()
+
         }
     }
 
