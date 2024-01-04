@@ -14,6 +14,9 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
 import android.view.MotionEvent
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.Toast
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -49,7 +52,11 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val initialBallPosYForBottom = 500f
     private var lives = 3 // Antal liv
 
+
+    private var isPaused = false
+
     private val bounceSpeedXFactor = 10.0f  // Justera detta värde efter behov
+
 
 
     private val soundEffect = SoundEffect(context)
@@ -95,13 +102,13 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
-      
+
         ballPong = BallPong(context, 100f, 100f, 30f, 15f, 15f, 0)
 
         paddle = PaddlePong(
             context,
             screenWidth / 2f,
-            screenHeight - 100f,  // for bottom paddle
+            screenHeight - 220f,  // for bottom paddle (Had to change for the smaller size) // JH
             180f,
             20f,
             Color.parseColor("#FFFF00")
@@ -114,6 +121,31 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             20f,
             Color.parseColor("#FFFF00")
         )
+    }
+
+    fun setupButton(button: ImageButton) {
+        button.setOnClickListener {
+            if (!onPaused()) {
+                isPaused = true
+            } else if (onPaused()) {
+                isPaused = false
+            }
+        }
+    }
+    private fun onPaused(): Boolean {
+        if(isPaused) {
+            return true
+        }
+        return false
+    }
+
+    private fun smallerSurfaceLayout(width: Int, height: Int) {
+        val layoutParams = FrameLayout.LayoutParams(
+            width,
+            height
+        )
+        layoutParams.topMargin = 120
+        setLayoutParams(layoutParams)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -160,8 +192,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     private fun loseLife() {
         lives--
-        if(lives<=0){
-            isGameOver =true
+        if (lives <= 0) {
+            soundEffect.play(2)
+            isGameOver = true
         }
     }
 
@@ -194,7 +227,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             loseLife()
 
 
-            soundEffect.play(2)
+
 
             resetBallPosition()
 
@@ -252,10 +285,11 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     override fun run() {
         while (running) {
-            update()
-            drawGameBounds(holder)
-            ballPong.checkBounds(bounds)
-
+            if (!isPaused) {
+                update()
+                drawGameBounds(holder)
+                ballPong.checkBounds(bounds)
+            }
         }
     }
 
@@ -286,6 +320,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         leftBoundaryPath = createBoundaryPathLeft(width, height)
         rightBoundaryPath = createBoundaryPathRight(width, height)
+        smallerSurfaceLayout(width, height)
         bounds = Rect(0, 0, width, height)
         start()
 
@@ -432,9 +467,11 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                     canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
-            if(isGameWon)
-                canvas?.drawText("CONGRATZ",canvas.width.toFloat() / 3,
-                    canvas.height.toFloat() - 300,gameWonPaint)
+            if (isGameWon)
+                canvas?.drawText(
+                    "CONGRATZ", canvas.width.toFloat() / 3,
+                    canvas.height.toFloat() - 300, gameWonPaint
+                )
         }
 
         leftBoundaryPath?.let {

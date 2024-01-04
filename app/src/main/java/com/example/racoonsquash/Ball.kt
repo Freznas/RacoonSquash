@@ -16,6 +16,7 @@ abstract class Ball(
     color: Int
 ) {
     var paint = Paint()
+
     init {
         paint.color = color
     }
@@ -23,11 +24,11 @@ abstract class Ball(
     abstract fun checkBounds(bounds: Rect)
     abstract fun draw(canvas: Canvas?)
 
-    open fun update() {
+    fun update() {
 
         ballPositionX += ballSpeedX
         ballPositionY += ballSpeedY
 
     }
-    
+
 }
