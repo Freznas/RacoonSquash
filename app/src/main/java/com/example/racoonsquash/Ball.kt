@@ -8,11 +8,11 @@ import android.graphics.Rect
 
 abstract class Ball(
     val context: Context,
-    var posX: Float,
-    var posY: Float,
-    var size: Float,
-    var speedX: Float,
-    var speedY: Float,
+    var ballPositionX: Float,
+    var ballPositionY: Float,
+    var ballSize: Float,
+    var ballSpeedX: Float,
+    var ballSpeedY: Float,
     color: Int
 ) {
     var paint = Paint()
@@ -26,8 +26,8 @@ abstract class Ball(
 
     fun update() {
 
-        posX += speedX
-        posY += speedY
+        ballPositionX += ballSpeedX
+        ballPositionY += ballSpeedY
 
     }
 
