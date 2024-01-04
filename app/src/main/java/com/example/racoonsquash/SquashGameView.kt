@@ -25,8 +25,6 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     private var score: Int = 0;
     private var isPaused = false
 
-
-
     //Path-klass ritar ett "spår" från en punkt moveTo() till nästa punkt lineTo()
     private var gameBoundaryPath: Path? = null
 

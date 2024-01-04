@@ -16,7 +16,6 @@ import kotlin.random.Random
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import android.widget.ImageButton
-import android.widget.Toast
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -29,7 +28,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     var isGameOver = false
     var isGameWon = false
-    lateinit var gameWonPaint: Paint
+    lateinit var textGameWonPaint: Paint
     private var textGameOverPaint: Paint
 
     //    private var scorePlayerTop = 0
@@ -50,13 +49,12 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val initialBallPosYForTop = 1300f
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
-    private var lives = 3 // Antal liv
+    private var lives = 1000 // Antal liv
 
 
     private var isPaused = false
 
     private val bounceSpeedXFactor = 10.0f  // Justera detta värde efter behov
-
 
 
     private val soundEffect = SoundEffect(context)
@@ -83,6 +81,13 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                 textSize = 60.0F
                 typeface = Typeface.create("serif-monospace", Typeface.BOLD)
             }
+            textGameWonPaint = Paint().apply {
+                color = Color.GREEN
+                alpha = 200
+                textSize = 60.0F
+                typeface = Typeface.create("serif-monospace", Typeface.BOLD)
+            }
+
             // Enbart för att synliggöra gränserna
             lineColor = Paint().apply {
                 color = Color.MAGENTA
@@ -132,8 +137,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             }
         }
     }
+
     private fun onPaused(): Boolean {
-        if(isPaused) {
+        if (isPaused) {
             return true
         }
         return false
@@ -209,6 +215,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         if (lives <= 0) {
             stop()
         }
+
+
         // Check collision with the bottom paddle
         if (isBallCollidingWithPaddle(ballPong, paddle)) {
             soundEffect.play(0)
@@ -227,8 +235,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             loseLife()
 
 
-
-
             resetBallPosition()
 
         } else if (ballPong.ballPositionY > screenHeight + ballPong.ballSize) {
@@ -245,7 +251,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         }
         if (checkWinCondition() == true) {
-            stop()
+            isGameWon = true
+
         }
 
 //        detta behöver vi om vi ska ha en maxpoäng (ändra bara 11an i if satsen till önskat maxpoäng)
@@ -265,6 +272,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
 
     private fun checkWinCondition(): Boolean {
+
         return blockList.isEmpty()
     }
 
@@ -338,8 +346,10 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         yPositionList.add(yPosition)
     }
 
-    private fun deleteBlockInList(block: BreakoutBlock) {
+    private fun deleteBlockInList(block: BreakoutBlock): Boolean {
+
         blockList.remove(block)
+        return blockList.isEmpty()
     }
 
     private fun addBlockInList(block: BreakoutBlock) {
@@ -375,10 +385,14 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
                 soundEffect.play(3)
 
-                deleteBlockInList(block)
+                isGameWon = deleteBlockInList(block)
+
                 break
             }
+
         }
+
+
     }
 
 
@@ -405,7 +419,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         // är samma, dvs. 50 så blir x-distansens 0. Samma gäller för Y.
         val distance =
             sqrt(
-                (ball.ballPositionX - commonX).toDouble().pow(2.0) + (ball.ballPositionY - commonY).toDouble()
+                (ball.ballPositionX - commonX).toDouble()
+                    .pow(2.0) + (ball.ballPositionY - commonY).toDouble()
                     .pow(2.0)
             )
 
@@ -423,14 +438,16 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         canvas?.drawText(livesText, 20f, 100f, scorePaint)
 
         rightBoundaryPath?.let {
-            if (checkWinCondition())
+            if (isGameWon) {
                 canvas?.drawText(
-                    "winText",
+                    "CONGRATZ",
                     canvas.width.toFloat() / 3,
                     canvas.height.toFloat() - 300,
-                    gameWonPaint
+                    textGameWonPaint
                 )
 
+//                    stop()
+            }
 
             if (isGameOver)
                 canvas?.drawText(
@@ -467,11 +484,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                     canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
-            if (isGameWon)
-                canvas?.drawText(
-                    "CONGRATZ", canvas.width.toFloat() / 3,
-                    canvas.height.toFloat() - 300, gameWonPaint
-                )
+
         }
 
         leftBoundaryPath?.let {
@@ -490,16 +503,22 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         ballPong.draw(canvas)
         holder.unlockCanvasAndPost(canvas)
+
+        if (isGameWon) {
+            stop()
+        }
     }
 
     private fun isBallCollidingWithPaddle(ball: BallPong, paddle: PaddlePong): Boolean {
         // Check if the ball is within the horizontal bounds of the paddle
-        val horizontalCollision = ball.ballPositionX + ball.ballSize > paddle.padPositionX - paddle.width / 2 &&
-                ball.ballPositionX - ball.ballSize < paddle.padPositionX + paddle.width / 2
+        val horizontalCollision =
+            ball.ballPositionX + ball.ballSize > paddle.padPositionX - paddle.width / 2 &&
+                    ball.ballPositionX - ball.ballSize < paddle.padPositionX + paddle.width / 2
 
         // Check if the ball is within the vertical bounds of the paddle
-        val verticalCollision = ball.ballPositionY + ball.ballSize > paddle.padPositionY - paddle.height / 2 &&
-                ball.ballPositionY - ball.ballSize < paddle.padPositionY + paddle.height / 2
+        val verticalCollision =
+            ball.ballPositionY + ball.ballSize > paddle.padPositionY - paddle.height / 2 &&
+                    ball.ballPositionY - ball.ballSize < paddle.padPositionY + paddle.height / 2
 
         return horizontalCollision && verticalCollision
     }
