@@ -1,18 +1,9 @@
 package com.example.racoonsquash
 
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.PathMeasure
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import android.widget.ImageButton
 import com.example.racoonsquash.databinding.ActivityPongBinding
-import com.example.racoonsquash.databinding.ActivitySquashBinding
 
 class PongActivity : AppCompatActivity() {
 
@@ -28,9 +19,11 @@ class PongActivity : AppCompatActivity() {
         val container = binding.root
         container.addView(gameView)
 
+
         val pauseButton: ImageButton = binding.btnPausePong
         val playButton: ImageButton = binding.btnPlayPong
         gameView.setupButton(pauseButton, playButton)
+
 
     }
 

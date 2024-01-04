@@ -17,9 +17,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
+
 import android.widget.Toast
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -32,7 +34,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     var isGameOver = false
     var isGameWon = false
-    lateinit var gameWonPaint: Paint
+    lateinit var textGameWonPaint: Paint
     private var textGameOverPaint: Paint
 
     //    private var scorePlayerTop = 0
@@ -53,13 +55,14 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val initialBallPosYForTop = 1300f
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
-    private var lives = 3 // Antal liv
+    private var lives = 1000 // Antal liv
 
+    // To adjust for marginTop to center the blocks (half of marginTop in function smallerSurfaceLayout)
+    private val marginOffset: Int = 75
 
     private var isPaused = false
 
     private val bounceSpeedXFactor = 10.0f  // Justera detta värde efter behov
-
 
     private val soundEffect = SoundEffect(context)
 
@@ -85,6 +88,13 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                 textSize = 60.0F
                 typeface = Typeface.create("serif-monospace", Typeface.BOLD)
             }
+            textGameWonPaint = Paint().apply {
+                color = Color.GREEN
+                alpha = 200
+                textSize = 60.0F
+                typeface = Typeface.create("serif-monospace", Typeface.BOLD)
+            }
+
             // Enbart för att synliggöra gränserna
             lineColor = Paint().apply {
                 color = Color.MAGENTA
@@ -125,6 +135,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         )
     }
 
+
     fun setupButton(pauseButton: ImageButton, playButton: ImageButton) {
         pauseButton.setOnClickListener {
                 isPaused = true
@@ -132,19 +143,24 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                 pauseButton.isVisible = false
 
         }
+
         playButton.setOnClickListener {
                 isPaused = false
                 playButton.isVisible = false
                 pauseButton.isVisible = true
+
         }
     }
 
     private fun smallerSurfaceLayout(width: Int, height: Int) {
+        val margin = 150
         val layoutParams = FrameLayout.LayoutParams(
             width,
-            height
+            height+margin // To adjust for surfaceView
         )
-        layoutParams.topMargin = 150
+
+        layoutParams.topMargin = margin
+      
         setLayoutParams(layoutParams)
     }
 
@@ -209,6 +225,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         if (lives <= 0) {
             stop()
         }
+
+
         // Check collision with the bottom paddle
         if (isBallCollidingWithPaddle(ballPong, paddle)) {
             soundEffect.play(0)
@@ -227,8 +245,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             loseLife()
 
 
-
-
             resetBallPosition()
 
         } else if (ballPong.ballPositionY > screenHeight + ballPong.ballSize) {
@@ -245,7 +261,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         }
         if (checkWinCondition() == true) {
-            stop()
+            isGameWon = true
+
         }
 
 //        detta behöver vi om vi ska ha en maxpoäng (ändra bara 11an i if satsen till önskat maxpoäng)
@@ -265,6 +282,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
 
     private fun checkWinCondition(): Boolean {
+
         return blockList.isEmpty()
     }
 
@@ -294,10 +312,10 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        val blockWidth = 180f
+        val blockWidth = 175f
         val blockHeight = 50f
         val centerX = (width / 2) - (blockWidth / 2)
-        val centerY = (height / 2) - (blockHeight / 2)
+        val centerY = (height / 2) - marginOffset - (blockHeight / 2)
         setup()
 
         // Column positions
@@ -338,8 +356,10 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         yPositionList.add(yPosition)
     }
 
-    private fun deleteBlockInList(block: BreakoutBlock) {
+    private fun deleteBlockInList(block: BreakoutBlock): Boolean {
+
         blockList.remove(block)
+        return blockList.isEmpty()
     }
 
     private fun addBlockInList(block: BreakoutBlock) {
@@ -375,10 +395,14 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
                 soundEffect.play(3)
 
-                deleteBlockInList(block)
+                isGameWon = deleteBlockInList(block)
+
                 break
             }
+
         }
+
+
     }
 
 
@@ -424,14 +448,16 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         canvas?.drawText(livesText, 20f, 100f, scorePaint)
 
         rightBoundaryPath?.let {
-            if (checkWinCondition())
+            if (isGameWon) {
                 canvas?.drawText(
-                    "winText",
+                    "CONGRATZ",
                     canvas.width.toFloat() / 3,
                     canvas.height.toFloat() - 300,
-                    gameWonPaint
+                    textGameWonPaint
                 )
 
+//                    stop()
+            }
 
             if (isGameOver)
                 canvas?.drawText(
@@ -468,11 +494,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                     canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
-            if (isGameWon)
-                canvas?.drawText(
-                    "CONGRATZ", canvas.width.toFloat() / 3,
-                    canvas.height.toFloat() - 300, gameWonPaint
-                )
+
         }
 
         leftBoundaryPath?.let {
@@ -491,6 +513,11 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
         ballPong.draw(canvas)
         holder.unlockCanvasAndPost(canvas)
+
+        if (isGameWon) {
+            stop()
+
+        }
     }
 
     private fun isBallCollidingWithPaddle(ball: BallPong, paddle: PaddlePong): Boolean {

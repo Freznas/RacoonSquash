@@ -7,6 +7,7 @@
     android:background="@color/black"
     tools:context=".PongActivity">
 
+
     <ImageButton
         android:id="@+id/btn_pause_pong"
         android:layout_width="wrap_content"
@@ -18,7 +19,6 @@
         android:layout_marginTop="@dimen/btn_play_pause_margin_top"
         android:scaleX="2"
         android:scaleY="2"/>
-
 
     <ImageButton
         android:id="@+id/btn_play_pong"
@@ -39,7 +39,6 @@
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/sv_margin_top"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp"
-        />
+        tools:layout_editor_absoluteY="0dp" />
 
 </FrameLayout>
