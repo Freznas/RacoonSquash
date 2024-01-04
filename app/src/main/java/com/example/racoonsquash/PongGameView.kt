@@ -52,12 +52,12 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val initialBallPosYForBottom = 500f
     private var lives = 3 // Antal liv
 
+    // To adjust for marginTop to center the blocks (half of marginTop in function smallerSurfaceLayout)
+    private val marginOffset: Int = 60
 
     private var isPaused = false
 
     private val bounceSpeedXFactor = 10.0f  // Justera detta värde efter behov
-
-
 
     private val soundEffect = SoundEffect(context)
 
@@ -123,7 +123,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         )
     }
 
-    fun setupButton(button: ImageButton) {
+    fun setupPlayPauseButton(button: ImageButton) {
         button.setOnClickListener {
             if (!onPaused()) {
                 isPaused = true
@@ -140,11 +140,12 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
 
     private fun smallerSurfaceLayout(width: Int, height: Int) {
+        val margin = 120
         val layoutParams = FrameLayout.LayoutParams(
             width,
-            height
+            height+margin // To adjust for surfaceView
         )
-        layoutParams.topMargin = 120
+        layoutParams.topMargin = margin
         setLayoutParams(layoutParams)
     }
 
@@ -294,10 +295,10 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        val blockWidth = 180f
+        val blockWidth = 175f
         val blockHeight = 50f
         val centerX = (width / 2) - (blockWidth / 2)
-        val centerY = (height / 2) - (blockHeight / 2)
+        val centerY = (height / 2) - marginOffset - (blockHeight / 2)
         setup()
 
         // Column positions

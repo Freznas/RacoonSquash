@@ -29,7 +29,7 @@ class PongActivity : AppCompatActivity() {
         container.addView(gameView)
 
         val pauseButton: ImageButton = findViewById(R.id.btn_play_pause_pong)
-        gameView.setupButton(pauseButton)
+        gameView.setupPlayPauseButton(pauseButton)
 
     }
 
