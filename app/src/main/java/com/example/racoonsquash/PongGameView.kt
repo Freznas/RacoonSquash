@@ -14,8 +14,14 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
 import android.view.MotionEvent
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
+
+import android.widget.Toast
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
+
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -129,21 +135,21 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         )
     }
 
-    fun setupPlayPauseButton(button: ImageButton) {
-        button.setOnClickListener {
-            if (!onPaused()) {
-                isPaused = true
-            } else if (onPaused()) {
-                isPaused = false
-            }
-        }
-    }
 
-    private fun onPaused(): Boolean {
-        if (isPaused) {
-            return true
+    fun setupButton(pauseButton: ImageButton, playButton: ImageButton) {
+        pauseButton.setOnClickListener {
+                isPaused = true
+                playButton.isVisible = true
+                pauseButton.isVisible = false
+
         }
-        return false
+
+        playButton.setOnClickListener {
+                isPaused = false
+                playButton.isVisible = false
+                pauseButton.isVisible = true
+
+        }
     }
 
     private fun smallerSurfaceLayout(width: Int, height: Int) {
@@ -152,7 +158,9 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             width,
             height+margin // To adjust for surfaceView
         )
+
         layoutParams.topMargin = margin
+      
         setLayoutParams(layoutParams)
     }
 

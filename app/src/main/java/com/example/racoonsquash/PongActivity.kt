@@ -19,8 +19,11 @@ class PongActivity : AppCompatActivity() {
         val container = binding.root
         container.addView(gameView)
 
-        val pauseButton: ImageButton = findViewById(R.id.btn_play_pause_pong)
-        gameView.setupPlayPauseButton(pauseButton)
+
+        val pauseButton: ImageButton = binding.btnPausePong
+        val playButton: ImageButton = binding.btnPlayPong
+        gameView.setupButton(pauseButton, playButton)
+
 
     }
 
