@@ -53,7 +53,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private var lives = 3 // Antal liv
 
     // To adjust for marginTop to center the blocks (half of marginTop in function smallerSurfaceLayout)
-    private val marginOffset: Int = 60
+    private val marginOffset: Int = 75
 
     private var isPaused = false
 
@@ -140,7 +140,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     }
 
     private fun smallerSurfaceLayout(width: Int, height: Int) {
-        val margin = 120
+        val margin = 150
         val layoutParams = FrameLayout.LayoutParams(
             width,
             height+margin // To adjust for surfaceView
