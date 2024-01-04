@@ -40,10 +40,10 @@ class SquashPad(
     override fun draw(canvas: Canvas?) {
         drawable?.let {
             it.setBounds(
-                (posX - it.intrinsicWidth / 2).toInt(),
-                (posY - it.intrinsicHeight / 2).toInt(),
-                (posX + it.intrinsicWidth / 2).toInt(),
-                (posY + it.intrinsicHeight / 2).toInt()
+                (ballPositionX - it.intrinsicWidth / 2).toInt(),
+                (ballPositionY - it.intrinsicHeight / 2).toInt(),
+                (ballPositionX + it.intrinsicWidth / 2).toInt(),
+                (ballPositionY + it.intrinsicHeight / 2).toInt()
             )
             canvas?.let { it1 -> it.draw(it1) }
         }

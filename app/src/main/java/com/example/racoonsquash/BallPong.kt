@@ -8,13 +8,13 @@ import android.graphics.Rect
 
 class BallPong(
     context: Context,
-    posX: Float,
-    posY: Float,
-    size: Float,
-    speedX: Float,
-    speedY: Float,
+    ballPositionX: Float,
+    ballPositionY: Float,
+    ballSize: Float,
+    ballSpeedX: Float,
+    ballSpeedY: Float,
     color: Int
-) : Ball(context, posX, posY, size, speedX, speedY, color) {
+) : Ball(context, ballPositionX, ballPositionY, ballSize, ballSpeedX, ballSpeedY, color) {
 
     private var bitmap: Bitmap
     private val soundEffect: SoundEffect = SoundEffect(context)
@@ -34,21 +34,21 @@ class BallPong(
 
     override fun checkBounds(bounds: Rect) {
         // Kolla vänster och höger vägg
-        if (posX - size < bounds.left || posX + size > bounds.right) {
+        if (ballPositionX - ballSize < bounds.left || ballPositionX + ballSize > bounds.right) {
             soundEffect.play(1)
-            speedX *= -1
-            if (posX - size < bounds.left) {
-                posX = bounds.left + size
-            } else if (posX + size > bounds.right) {
-                posX = bounds.right - size
+            ballSpeedX *= -1
+            if (ballPositionX - ballSize < bounds.left) {
+                ballPositionX = bounds.left + ballSize
+            } else if (ballPositionX + ballSize > bounds.right) {
+                ballPositionX = bounds.right - ballSize
             }
         }
 
     }
 
     override fun draw(canvas: Canvas?) {
-        val centerX = posX - bitmap.width / 2
-        val centerY = posY - bitmap.height / 2
+        val centerX = ballPositionX - bitmap.width / 2
+        val centerY = ballPositionY - bitmap.height / 2
 
         canvas?.drawBitmap(bitmap, centerX, centerY, null)
 

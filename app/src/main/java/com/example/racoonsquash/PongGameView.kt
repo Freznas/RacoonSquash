@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import kotlin.math.pow
@@ -47,6 +48,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
     private var lives = 3 // Antal liv
+
+    private val bounceSpeedXFactor = 10.0f  // Justera detta värde efter behov
 
 
     private val soundEffect = SoundEffect(context)
@@ -176,17 +179,17 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         // Check collision with the bottom paddle
         if (isBallCollidingWithPaddle(ballPong, paddle)) {
             soundEffect.play(0)
-            ballPong.speedY = -ballPong.speedY // Reverse Y-direction
+            handleBallPaddleCollision(ballPong, paddle)
         }
 
         // Check collision with the top paddle
         if (isBallCollidingWithPaddle(ballPong, topPaddle)) {
             soundEffect.play(0)
-            ballPong.speedY = -ballPong.speedY // Reverse Y-direction
+            handleBallPaddleCollision(ballPong, topPaddle)
         }
 
 
-        if (ballPong.posY < -ballPong.size) {
+        if (ballPong.ballPositionY < -ballPong.ballSize) {
 
             loseLife()
 
@@ -195,13 +198,13 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
             resetBallPosition()
 
-        } else if (ballPong.posY > screenHeight + ballPong.size) {
+        } else if (ballPong.ballPositionY > screenHeight + ballPong.ballSize) {
 
             loseLife()
             resetBallPosition()
 
 
-        } else if (ballPong.posX < 0) {
+        } else if (ballPong.ballPositionX < 0) {
 //            scorePlayerBottom = 0
 //            scorePlayerTop = 0
 
@@ -235,14 +238,14 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private fun resetBallPosition() {
         // Placera bollen på olika startpositioner beroende på var den åker ut
 
-        if (ballPong.posY < -ballPong.size) {
+        if (ballPong.ballPositionY < -ballPong.ballSize) {
             Thread.sleep(0)
-            ballPong.posX = initialBallPosXForTop
-            ballPong.posY = initialBallPosYForTop
-        } else if (ballPong.posY > screenHeight - ballPong.size) {
+            ballPong.ballPositionX = initialBallPosXForTop
+            ballPong.ballPositionY = initialBallPosYForTop
+        } else if (ballPong.ballPositionY > screenHeight - ballPong.ballSize) {
             Thread.sleep(0)
-            ballPong.posX = initialBallPosXForBottom
-            ballPong.posY = initialBallPosYForBottom
+            ballPong.ballPositionX = initialBallPosXForBottom
+            ballPong.ballPositionY = initialBallPosYForBottom
         }
     }
 
@@ -331,7 +334,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private fun checkBallBlockCollision() {
         for (block in blockList) {
             if (onBlockCollision(block, ballPong)) {
-                ballPong.speedY *= -1
+                ballPong.ballSpeedY *= -1
 
                 score++
 
@@ -346,33 +349,33 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     private fun onBlockCollision(block: BreakoutBlock, ball: BallPong): Boolean {
         // CommonX sparar bollens x-position om den befinner sig inom blockets x-position
-        val commonX = if (ball.posX < block.posX) {
+        val commonX = if (ball.ballPositionX < block.posX) {
             block.posX
-        } else if (ball.posX > block.width) {
+        } else if (ball.ballPositionX > block.width) {
             block.width
         } else {
-            ball.posX
+            ball.ballPositionX
         }
 
         // CommonY sparar bollens y-position om den befinner sig inom blockets y-position
-        val commonY = if (ball.posY < block.posY) {
+        val commonY = if (ball.ballPositionY < block.posY) {
             block.posY
-        } else if (ball.posY > block.height) {
+        } else if (ball.ballPositionY > block.height) {
             block.height
         } else {
-            ball.posY
+            ball.ballPositionY
         }
 
         // Här räknas distansen ut. Exempel, om bollens x-position är 50 och commonX
         // är samma, dvs. 50 så blir x-distansens 0. Samma gäller för Y.
         val distance =
             sqrt(
-                (ball.posX - commonX).toDouble().pow(2.0) + (ball.posY - commonY).toDouble()
+                (ball.ballPositionX - commonX).toDouble().pow(2.0) + (ball.ballPositionY - commonY).toDouble()
                     .pow(2.0)
             )
 
         // Returnerar true när distansen är 0 och drar bort bollens size.
-        return distance < ball.size
+        return distance < ball.ballSize
 
     }
 
@@ -403,7 +406,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
                 )
 
             canvas?.drawPath(it, lineColor)
-            if (ballPong.posY < 0 - ballPong.size) {
+            if (ballPong.ballPositionY < 0 - ballPong.ballSize) {
                 canvas?.drawPath(it, touchColor)
                 canvas?.drawText(
                     "Score: $score",
@@ -454,14 +457,24 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     private fun isBallCollidingWithPaddle(ball: BallPong, paddle: PaddlePong): Boolean {
         // Check if the ball is within the horizontal bounds of the paddle
-        val horizontalCollision = ball.posX + ball.size > paddle.positionX - paddle.width / 2 &&
-                ball.posX - ball.size < paddle.positionX + paddle.width / 2
+        val horizontalCollision = ball.ballPositionX + ball.ballSize > paddle.padPositionX - paddle.width / 2 &&
+                ball.ballPositionX - ball.ballSize < paddle.padPositionX + paddle.width / 2
 
         // Check if the ball is within the vertical bounds of the paddle
-        val verticalCollision = ball.posY + ball.size > paddle.positionY - paddle.height / 2 &&
-                ball.posY - ball.size < paddle.positionY + paddle.height / 2
+        val verticalCollision = ball.ballPositionY + ball.ballSize > paddle.padPositionY - paddle.height / 2 &&
+                ball.ballPositionY - ball.ballSize < paddle.padPositionY + paddle.height / 2
 
         return horizontalCollision && verticalCollision
+    }
+
+    private fun handleBallPaddleCollision(ball: BallPong, paddle: PaddlePong) {
+        // Invertera Y-hastigheten för att bollen ska studsa
+        ball.ballSpeedY = -ball.ballSpeedY
+
+        // Justera X-hastigheten baserat på träffpunkten på paddeln
+        val impactPoint = (ball.ballPositionX - paddle.padPositionX) / (paddle.width / 2)
+
+        ball.ballSpeedX = bounceSpeedXFactor * impactPoint
     }
 
     //     Enbart spelplan med linje för syns skull, vänster sidolinje.
