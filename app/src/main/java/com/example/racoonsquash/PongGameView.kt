@@ -14,9 +14,12 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
 import android.view.MotionEvent
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 
 class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
@@ -56,7 +59,6 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private var isPaused = false
 
     private val bounceSpeedXFactor = 10.0f  // Justera detta värde efter behov
-
 
 
     private val soundEffect = SoundEffect(context)
@@ -123,20 +125,18 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         )
     }
 
-    fun setupButton(button: ImageButton) {
-        button.setOnClickListener {
-            if (!onPaused()) {
+    fun setupButton(pauseButton: ImageButton, playButton: ImageButton) {
+        pauseButton.setOnClickListener {
                 isPaused = true
-            } else if (onPaused()) {
+                playButton.isVisible = true
+                pauseButton.isVisible = false
+
+        }
+        playButton.setOnClickListener {
                 isPaused = false
-            }
+                playButton.isVisible = false
+                pauseButton.isVisible = true
         }
-    }
-    private fun onPaused(): Boolean {
-        if(isPaused) {
-            return true
-        }
-        return false
     }
 
     private fun smallerSurfaceLayout(width: Int, height: Int) {
@@ -144,7 +144,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
             width,
             height
         )
-        layoutParams.topMargin = 120
+        layoutParams.topMargin = 150
         setLayoutParams(layoutParams)
     }
 
@@ -405,7 +405,8 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         // är samma, dvs. 50 så blir x-distansens 0. Samma gäller för Y.
         val distance =
             sqrt(
-                (ball.ballPositionX - commonX).toDouble().pow(2.0) + (ball.ballPositionY - commonY).toDouble()
+                (ball.ballPositionX - commonX).toDouble()
+                    .pow(2.0) + (ball.ballPositionY - commonY).toDouble()
                     .pow(2.0)
             )
 
@@ -494,12 +495,14 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
 
     private fun isBallCollidingWithPaddle(ball: BallPong, paddle: PaddlePong): Boolean {
         // Check if the ball is within the horizontal bounds of the paddle
-        val horizontalCollision = ball.ballPositionX + ball.ballSize > paddle.padPositionX - paddle.width / 2 &&
-                ball.ballPositionX - ball.ballSize < paddle.padPositionX + paddle.width / 2
+        val horizontalCollision =
+            ball.ballPositionX + ball.ballSize > paddle.padPositionX - paddle.width / 2 &&
+                    ball.ballPositionX - ball.ballSize < paddle.padPositionX + paddle.width / 2
 
         // Check if the ball is within the vertical bounds of the paddle
-        val verticalCollision = ball.ballPositionY + ball.ballSize > paddle.padPositionY - paddle.height / 2 &&
-                ball.ballPositionY - ball.ballSize < paddle.padPositionY + paddle.height / 2
+        val verticalCollision =
+            ball.ballPositionY + ball.ballSize > paddle.padPositionY - paddle.height / 2 &&
+                    ball.ballPositionY - ball.ballSize < paddle.padPositionY + paddle.height / 2
 
         return horizontalCollision && verticalCollision
     }
