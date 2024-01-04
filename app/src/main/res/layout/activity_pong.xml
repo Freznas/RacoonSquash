@@ -7,13 +7,20 @@
     android:background="@color/racoon_light_blue"
     tools:context=".PongActivity">
 
-    <ImageButton
-        android:id="@+id/btn_play_pause_pong"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/small_play"
-        android:layout_marginEnd="20dp"
-        android:layout_gravity="end"/>
+        android:gravity="end|center">
+
+        <ImageButton
+            android:id="@+id/btn_play_pause_pong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/small_play" />
+
+    </LinearLayout>
 
     <SurfaceView
         android:id="@+id/sv_pong"
@@ -21,7 +28,6 @@
         android:layout_height="match_parent"
         android:layout_marginTop="50dp"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp"
-        />
+        tools:layout_editor_absoluteY="0dp" />
 
 </FrameLayout>
