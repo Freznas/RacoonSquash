@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable
 class SquashPad(
 
     context: Context,
-    posX: Float,
+    padPosX: Float,
     posY: Float,
     size: Float,
     speedX: Float,
@@ -16,13 +16,13 @@ class SquashPad(
     val width: Float,
     val height: Float,
     speed: Float
-) : BallSquash(context, posX, posY, size, speedX, speedY, color, speed) {
+) : BallSquash(context, padPosX, posY, size, speedX, speedY, color, speed) {
 
 
-    var left: Float = posX - size
+    var left: Float = padPosX - size
         private set
 
-    var right: Float = posX + size
+    var right: Float = padPosX + size
         private set
 
     var top: Float = posY - size
