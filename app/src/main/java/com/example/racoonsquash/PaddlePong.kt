@@ -7,20 +7,20 @@ import android.graphics.RectF
 
 class PaddlePong(
     private val context: Context,
-    var padPositionX: Float,
-    var padPositionY: Float,
-    val width: Float,
-    val height: Float,
-    color: Int
+    var padPongPositionX: Float,
+    var padPongPositionY: Float,
+    val padPongWidth: Float,
+    val padPongHeight: Float,
+    padPongColor: Int
 ) {
     private val paint: Paint = Paint().apply {
-        this.color = color
+        this.color = padPongColor
         style = Paint.Style.FILL
     }
 
     private var paddleRect: RectF = RectF(
-        this.padPositionX - width / 2, this.padPositionY - height / 2,
-        this.padPositionX + width / 2, this.padPositionY + height / 2
+        this.padPongPositionX - padPongWidth / 2, this.padPongPositionY - padPongHeight / 2,
+        this.padPongPositionX + padPongWidth / 2, this.padPongPositionY + padPongHeight / 2
     )
 
     fun draw(canvas: Canvas) {
@@ -28,20 +28,20 @@ class PaddlePong(
     }
 
     fun move(newX: Float) {
-        padPositionX = newX
+        padPongPositionX = newX
         keepPaddleInBounds()
         updatePaddleRect()
     }
 
     private fun keepPaddleInBounds() {
         val screenWidth = context.resources.displayMetrics.widthPixels
-        padPositionX = padPositionX.coerceIn(width / 2, screenWidth - width / 2)
+        padPongPositionX = padPongPositionX.coerceIn(padPongWidth / 2, screenWidth - padPongWidth / 2)
     }
 
     private fun updatePaddleRect() {
         paddleRect.set(
-            padPositionX - width / 2, padPositionY - height / 2,
-            padPositionX + width / 2, padPositionY + height / 2
+            padPongPositionX - padPongWidth / 2, padPongPositionY - padPongHeight / 2,
+            padPongPositionX + padPongWidth / 2, padPongPositionY + padPongHeight / 2
         )
     }
 

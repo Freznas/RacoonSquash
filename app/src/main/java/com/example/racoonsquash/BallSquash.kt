@@ -6,17 +6,18 @@ import android.graphics.Rect
 
 open class BallSquash(
     context: Context,
-    posX: Float,
-    posY: Float,
-    size: Float,
-    speedX: Float,
-    speedY: Float,
-    color: Int,
-    var speed: Float
-) : Ball(context, posX, posY, size, speedX, speedY, color) {
+    ballSquashPositionX: Float,
+    ballSquashPositionY: Float,
+    ballSquashSize: Float,
+    ballSquashSpeedX: Float,
+    ballSquashSpeedY: Float,
+    ballSquashColor: Int,
+    val ballSquashSpeed: Float
+) : Ball(context, ballSquashPositionX, ballSquashPositionY, ballSquashSize, ballSquashSpeedX, ballSquashSpeedY, ballSquashColor) {
+    private val soundEffect: SoundEffect = SoundEffect(context)
 
     init {
-        paint.color = color
+        paint.color = ballSquashColor
     }
 
     override fun checkBounds(bounds: Rect) {

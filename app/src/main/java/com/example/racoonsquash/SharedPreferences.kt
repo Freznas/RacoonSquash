@@ -2,7 +2,7 @@ package com.example.racoonsquash
 
 import android.app.Application
 
-class MyApp : Application() {
+class SharedPreferences : Application() {
     lateinit var sharedPreferencesManager: SharedPreferencesManager
 
     override fun onCreate() {

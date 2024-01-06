@@ -7,19 +7,15 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
-import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
 import android.view.MotionEvent
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 
-import android.widget.Toast
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 
 
@@ -523,13 +519,13 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
     private fun isBallCollidingWithPaddle(ball: BallPong, paddle: PaddlePong): Boolean {
         // Check if the ball is within the horizontal bounds of the paddle
         val horizontalCollision =
-            ball.ballPositionX + ball.ballSize > paddle.padPositionX - paddle.width / 2 &&
-                    ball.ballPositionX - ball.ballSize < paddle.padPositionX + paddle.width / 2
+            ball.ballPositionX + ball.ballSize > paddle.padPongPositionX - paddle.padPongWidth / 2 &&
+                    ball.ballPositionX - ball.ballSize < paddle.padPongPositionX + paddle.padPongWidth / 2
 
         // Check if the ball is within the vertical bounds of the paddle
         val verticalCollision =
-            ball.ballPositionY + ball.ballSize > paddle.padPositionY - paddle.height / 2 &&
-                    ball.ballPositionY - ball.ballSize < paddle.padPositionY + paddle.height / 2
+            ball.ballPositionY + ball.ballSize > paddle.padPongPositionY - paddle.padPongHeight / 2 &&
+                    ball.ballPositionY - ball.ballSize < paddle.padPongPositionY + paddle.padPongHeight / 2
 
         return horizontalCollision && verticalCollision
     }
@@ -539,7 +535,7 @@ class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callb
         ball.ballSpeedY = -ball.ballSpeedY
 
         // Justera X-hastigheten baserat på träffpunkten på paddeln
-        val impactPoint = (ball.ballPositionX - paddle.padPositionX) / (paddle.width / 2)
+        val impactPoint = (ball.ballPositionX - paddle.padPongPositionX) / (paddle.padPongWidth / 2)
 
         ball.ballSpeedX = bounceSpeedXFactor * impactPoint
     }

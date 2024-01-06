@@ -17,13 +17,14 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     private var thread: Thread? = null
     private var running = false
     lateinit var ballSquash: BallSquash
-    lateinit var squashPad: SquashPad
+    lateinit var padSquash: SquashPad
     private var lineColor: Paint
     private var touchColor: Paint
     private var scorePaint: Paint
     private var textGameOverPaint: Paint
-    private var score: Int = 0;
+    private var scoreSquash: Int = 0;
     private var isPaused = false
+    private val soundEffect = SoundEffect(context)
 
     //Path-klass ritar ett "spår" från en punkt moveTo() till nästa punkt lineTo()
     private var gameBoundaryPath: Path? = null
@@ -82,7 +83,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         ballSquash = BallSquash(this.context, 100f, 100f, 30f, 20f, 20f, Color.RED, 20f)
 
        // val drawablePaddle = resources.getDrawable(R.drawable.player_pad_a, null)
-        squashPad = SquashPad(
+        padSquash = SquashPad(
             this.context, 50f, 400f, 6f, 0f, 0f, 0,
             15f, 75f, 0f
         )
@@ -107,7 +108,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     }
 
     fun update() {
-        ballIntersects(ballSquash, squashPad)
+        ballIntersects(ballSquash, padSquash)
         ballSquash.update()
         // Räknar bara när boll rör långsidan just nu
         if (ballSquash.ballPositionX > width - ballSquash.ballSize) {
@@ -137,7 +138,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             val y = event.y.toInt()
             if (!isInsidePauseRectangule(x, y)) {
                 // User is not clicking on pause
-                squashPad.ballPositionY = event.y // Move pad
+                padSquash.ballPositionY = event.y // Move pad
             } else if (isInsidePauseRectangule(x, y) && event.action == MotionEvent.ACTION_DOWN) {
                 // User is clicking on Pause
                 buttonPauseText = if (isPaused) context.getString(R.string.pauseText)
@@ -157,23 +158,23 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 // bestämma vart på padeln som bollen träffar.
 // sen bestäms studsriktningen beroende på vart på padeln kollisionen sker
 // sen så räknas vinkeln genom multiplicera normaliserade värdet.
-    fun onBallCollision(ballSquash1: BallSquash, squashPad: SquashPad) {
+    fun onBallCollision(ballSquash1: BallSquash, padSquash: SquashPad) {
 
-        val relativeIntersectY = squashPad.ballPositionY - ballSquash1.ballPositionY
-        val normalizedIntersectY = (relativeIntersectY / (squashPad.height / 2)).coerceIn(-1f, 1f)
+        val relativeIntersectY = padSquash.ballPositionY - ballSquash1.ballPositionY
+        val normalizedIntersectY = (relativeIntersectY / (padSquash.padSquashHeight / 2)).coerceIn(-1f, 1f)
         val bounceAngle =
             normalizedIntersectY * Math.PI / 7
 
-        ballSquash1.ballSpeedX = (ballSquash1.speed * Math.cos(bounceAngle)).toFloat()
-        ballSquash1.ballSpeedY = (-ballSquash1.speed * Math.sin(bounceAngle)).toFloat()
+        ballSquash1.ballSpeedX = (ballSquash1.ballSquashSpeed * Math.cos(bounceAngle)).toFloat()
+        ballSquash1.ballSpeedY = (-ballSquash1.ballSquashSpeed * Math.sin(bounceAngle)).toFloat()
     }
 
     // här tar vi in storlek från ball och squashPad och kontrollerar när en kollision sker
     fun ballIntersects(ballSquash1: BallSquash, squashPad: SquashPad) {
-        val padLeft = squashPad.ballPositionX - squashPad.width
-        val padRight = squashPad.ballPositionX + squashPad.width
-        val padTop = squashPad.ballPositionY - squashPad.height
-        val padBottom = squashPad.ballPositionY + squashPad.height
+        val padLeft = squashPad.ballPositionX - squashPad.padSquashWidth
+        val padRight = squashPad.ballPositionX + squashPad.padSquashWidth
+        val padTop = squashPad.ballPositionY - squashPad.padSquashHeight
+        val padBottom = squashPad.ballPositionY + squashPad.padSquashHeight
         val ballLeft = ballSquash1.ballPositionX - ballSquash1.ballSize
         val ballRight = ballSquash1.ballPositionX + ballSquash1.ballSize
         val ballTop = ballSquash1.ballPositionY - ballSquash1.ballSize
@@ -182,7 +183,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         if (ballRight >= padLeft && ballLeft <= padRight && ballBottom >= padTop && ballTop <=
             padBottom
         ) {
-            onBallCollision(ballSquash1, squashPad)
+            onBallCollision(ballSquash1, padSquash)
         }
     }
 
@@ -218,7 +219,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
                 canvas?.drawPath(it, touchColor)
                 canvas?.drawText(
-                    "Score: $score",
+                    "Score: $scoreSquash",
                     canvas.width.toFloat() - 400,
                     0f + 100,
                     textGameOverPaint
@@ -232,11 +233,11 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
                 // Save score
                 val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
-                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.SQUASH))
+                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, scoreSquash, DataManager.Game.SQUASH))
             } else {
                 // Placera text
                 canvas?.drawText(
-                    "Score: $score",
+                    "Score: $scoreSquash",
                     canvas.width.toFloat() - 400,
                     0f + 100,
                     scorePaint
@@ -246,7 +247,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
 
         ballSquash.draw(canvas)
-        squashPad.draw(canvas)
+        padSquash.draw(canvas)
 
         //Draw pause button
         if (canvas != null) {
@@ -282,7 +283,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     }
 
     private fun updateScore(): Int {
-        score++
-        return score
+        scoreSquash++
+        return scoreSquash
     }
 }

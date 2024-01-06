@@ -8,13 +8,13 @@ import android.graphics.Rect
 
 class BallPong(
     context: Context,
-    ballPositionX: Float,
-    ballPositionY: Float,
-    ballSize: Float,
-    ballSpeedX: Float,
-    ballSpeedY: Float,
-    color: Int
-) : Ball(context, ballPositionX, ballPositionY, ballSize, ballSpeedX, ballSpeedY, color) {
+    ballPongPositionX: Float,
+    ballPongPositionY: Float,
+    ballPongSize: Float,
+    ballPongSpeedX: Float,
+    ballPongSpeedY: Float,
+    ballPongColor: Int
+) : Ball(context, ballPongPositionX, ballPongPositionY, ballPongSize, ballPongSpeedX, ballPongSpeedY, ballPongColor) {
 
     private var bitmap: Bitmap
     private val soundEffect: SoundEffect = SoundEffect(context)
