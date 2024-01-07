@@ -23,7 +23,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 
 
-class PongGameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
+class PongGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
     var running = false
     var lineColor: Paint

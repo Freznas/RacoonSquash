@@ -15,14 +15,16 @@ class PongActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val surfaceHolder = binding.svPong.holder
-        val gameView = PongGameView(this)
+        val gameView = intent.getStringExtra("userName")?.let { PongGameView(this, it) }
         val container = binding.root
         container.addView(gameView)
 
 
         val pauseButton: ImageButton = binding.btnPausePong
         val playButton: ImageButton = binding.btnPlayPong
-        gameView.setupButton(pauseButton, playButton)
+        if (gameView != null) {
+            gameView.setupButton(pauseButton, playButton)
+        }
 
 
     }
