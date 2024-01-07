@@ -1,5 +1,6 @@
 package com.example.racoonsquash
 
+
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -7,20 +8,15 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
-import android.util.Log
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import androidx.core.view.isVisible
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
-import android.view.MotionEvent
-import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageButton
-
-import android.widget.Toast
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 
 
 class PongGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
@@ -55,7 +51,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val initialBallPosYForTop = 1300f
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
-    private var lives = 1000 // Antal liv
+    private var lives = 2 // Antal liv
 
     // To adjust for marginTop to center the blocks (half of marginTop in function smallerSurfaceLayout)
     private val marginOffset: Int = 75
@@ -160,7 +156,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         )
 
         layoutParams.topMargin = margin
-      
+
         setLayoutParams(layoutParams)
     }
 
@@ -455,17 +451,22 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     canvas.height.toFloat() - 300,
                     textGameWonPaint
                 )
-
+                // Save score
+                val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
+                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.PONG))
 //                    stop()
             }
 
-            if (isGameOver)
-                canvas?.drawText(
-                    "GAME OVER",
-                    canvas.width.toFloat() / 3,
-                    canvas.height.toFloat() - 300,
-                    textGameOverPaint
-                )
+//            if (isGameOver)
+//                canvas?.drawText(
+//                    "GAME OVER",
+//                    canvas.width.toFloat() / 3,
+//                    canvas.height.toFloat() - 300,
+//                    textGameOverPaint
+//                )
+            // Save score
+            val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
+            sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.PONG))
 
             canvas?.drawPath(it, lineColor)
             if (ballPong.ballPositionY < 0 - ballPong.ballSize) {
@@ -486,7 +487,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     0f + 100,
                     scorePaint
                 )
-            }
+            } //DENNA MÅSTE VARA KVAR:
             if (lives <= 0)
                 canvas?.drawText(
                     "GAME OVER",
