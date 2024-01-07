@@ -51,7 +51,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val initialBallPosYForTop = 1300f
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
-    private var lives = 2 // Antal liv
+    private var lives = 3// Antal liv
 
     // To adjust for marginTop to center the blocks (half of marginTop in function smallerSurfaceLayout)
     private val marginOffset: Int = 75
@@ -111,7 +111,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     private fun setup() {
 
-        ballPong = BallPong(context, 100f, 100f, 30f, 15f, 15f, 0)
+        ballPong = BallPong(context, 150f, 150f, 30f, 15f, 15f, 0)
 
         paddle = PaddlePong(
             context,
@@ -238,20 +238,18 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         if (ballPong.ballPositionY < -ballPong.ballSize) {
 
-            loseLife()
 
 
             resetBallPosition()
 
         } else if (ballPong.ballPositionY > screenHeight + ballPong.ballSize) {
 
-            loseLife()
+
             resetBallPosition()
 
 
         } else if (ballPong.ballPositionX < 0) {
-//            scorePlayerBottom = 0
-//            scorePlayerTop = 0
+
 
             score = 0
 
@@ -261,18 +259,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         }
 
-//        detta behöver vi om vi ska ha en maxpoäng (ändra bara 11an i if satsen till önskat maxpoäng)
-//        if (score >= 11) {
-//
-//            try {
-//                Thread.sleep(5000)
-//            } catch (e: InterruptedException) {
-//                e.printStackTrace()
-//            }
-//            score = 0
-//            scorePlayerBottom = 0
-//            scorePlayerTop = 0
-//    }
+
         resetBallPosition()
     }
 
@@ -286,10 +273,12 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         // Placera bollen på olika startpositioner beroende på var den åker ut
 
         if (ballPong.ballPositionY < -ballPong.ballSize) {
+            loseLife()
             Thread.sleep(0)
             ballPong.ballPositionX = initialBallPosXForTop
             ballPong.ballPositionY = initialBallPosYForTop
         } else if (ballPong.ballPositionY > screenHeight - ballPong.ballSize) {
+            loseLife()
             Thread.sleep(0)
             ballPong.ballPositionX = initialBallPosXForBottom
             ballPong.ballPositionY = initialBallPosYForBottom
@@ -316,17 +305,17 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         // Column positions
         columnBlockPosition(centerX - 400f)
-        columnBlockPosition(centerX - 200f)
-        columnBlockPosition(centerX)
-        columnBlockPosition(centerX + 200f)
-        columnBlockPosition(centerX + 400f)
+//        columnBlockPosition(centerX - 200f)
+//        columnBlockPosition(centerX)
+//        columnBlockPosition(centerX + 200f)
+//        columnBlockPosition(centerX + 400f)
 
         // Row positions
         rowBlockPosition(centerY - 140f)
-        rowBlockPosition(centerY - 70f)
-        rowBlockPosition(centerY)
-        rowBlockPosition(centerY + 70f)
-        rowBlockPosition(centerY + 140f)
+//        rowBlockPosition(centerY - 70f)
+//        rowBlockPosition(centerY)
+//        rowBlockPosition(centerY + 70f)
+//        rowBlockPosition(centerY + 140f)
 
         buildBreakoutBlocks()
     }
