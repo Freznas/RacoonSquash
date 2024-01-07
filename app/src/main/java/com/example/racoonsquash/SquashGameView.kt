@@ -25,7 +25,6 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     private var score: Int = 0;
     private var isPaused = false
     private val soundEffect = SoundEffect(context)
-    private val padPosX: Float = 0.0f
 
     //Path-klass ritar ett "spår" från en punkt moveTo() till nästa punkt lineTo()
     private var gameBoundaryPath: Path? = null
@@ -115,10 +114,10 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         // Räknar bara när boll rör långsidan just nu
         if (ballSquash.ballPositionX > width - ballSquash.ballSize) {
             updateScore()
-            soundEffect.play(4) //ljud när boll rör långsidan
+            soundEffect.play(4) //ljudeffekt när boll rör långsidan
         }
         if (ballSquash.ballPositionY > height - ballSquash.ballSize){
-            soundEffect.play(4) //ljud när boll rör golvet
+            soundEffect.play(4) //ljudeffekt när boll rör golvet
         }
     }
 
@@ -190,6 +189,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             padBottom
         ) {
             onBallCollision(ballSquash1, squashPad)
+            soundEffect.play(5) //ljudeffekt när boll rör pad
         }
     }
 

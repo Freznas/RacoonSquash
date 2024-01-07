@@ -12,8 +12,9 @@ class SoundEffect (context: Context) : Sound {
     private val wallBounceSound: Int = soundPool.load(context, R.raw.wallbounce, 2)
     private val gameOverSound: Int = soundPool.load(context, R.raw.lose, 1)
     private val upSound: Int = soundPool.load(context, R.raw.up, 2)
-    private val squashBounceSound: Int = soundPool.load(context, R.raw.squashbounce, 2)
-    private val squashBasketballSound: Int = soundPool.load(context, R.raw.squashbasketball, 2)
+    private val squashBounceSound: Int = soundPool.load(context, R.raw.squashbounce, 1)
+    private val squashBouncySound: Int = soundPool.load(context, R.raw.squashbouncy, 2)
+    private val squashFailureSound: Int = soundPool.load(context, R.raw.squashfailure, 2)
 
     // Sätter id på varje ljud och beroende på id, spela upp ljudeffekt
     private var audioID: Int = 0
@@ -28,7 +29,8 @@ class SoundEffect (context: Context) : Sound {
             2 -> soundPool.play(gameOverSound, 1.0f, 1.0f, 1, 0, 1.0f)
             3 -> soundPool.play(upSound, 1.0f, 1.0f, 2, 0, 1.0f)
             4 -> soundPool.play(squashBounceSound, 1.0f, 1.0f, 1, 0, 1.0f)
-            5 -> soundPool.play(squashBasketballSound, 1.0f, 1.0f, 1, 0, 1.0f)
+            5 -> soundPool.play(squashBouncySound, 1.0f, 1.0f, 1, 0, 1.0f)
+            6 -> soundPool.play(squashFailureSound, 1.0f, 1.0f, 1, 0, 1.0f)
         }
     }
 
