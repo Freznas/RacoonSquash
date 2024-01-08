@@ -134,17 +134,19 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     fun setupButton(pauseButton: ImageButton, playButton: ImageButton) {
         pauseButton.setOnClickListener {
+            if (!isGameWon) {
                 isPaused = true
                 playButton.isVisible = true
                 pauseButton.isVisible = false
-
+            }
         }
 
         playButton.setOnClickListener {
+            if (!isGameWon) {
                 isPaused = false
                 playButton.isVisible = false
                 pauseButton.isVisible = true
-
+            }
         }
     }
 
@@ -293,6 +295,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                 update()
                 drawGameBounds(holder)
                 ballPong.checkBounds(bounds)
+            } else {
+                stop()
             }
         }
     }
