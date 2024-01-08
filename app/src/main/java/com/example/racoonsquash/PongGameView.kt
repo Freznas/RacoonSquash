@@ -134,7 +134,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     fun setupButton(pauseButton: ImageButton, playButton: ImageButton) {
         pauseButton.setOnClickListener {
-            if (!isGameWon) {
+            if (!isGameWon && lives > 0) {
                 isPaused = true
                 playButton.isVisible = true
                 pauseButton.isVisible = false
@@ -142,7 +142,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
 
         playButton.setOnClickListener {
-            if (!isGameWon) {
+            if (!isGameWon && lives > 0) {
                 isPaused = false
                 playButton.isVisible = false
                 pauseButton.isVisible = true
@@ -310,17 +310,17 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         // Column positions
         columnBlockPosition(centerX - 400f)
-//        columnBlockPosition(centerX - 200f)
-//        columnBlockPosition(centerX)
-//        columnBlockPosition(centerX + 200f)
-//        columnBlockPosition(centerX + 400f)
+        columnBlockPosition(centerX - 200f)
+        columnBlockPosition(centerX)
+        columnBlockPosition(centerX + 200f)
+        columnBlockPosition(centerX + 400f)
 
         // Row positions
         rowBlockPosition(centerY - 140f)
-//        rowBlockPosition(centerY - 70f)
-//        rowBlockPosition(centerY)
-//        rowBlockPosition(centerY + 70f)
-//        rowBlockPosition(centerY + 140f)
+        rowBlockPosition(centerY - 70f)
+        rowBlockPosition(centerY)
+        rowBlockPosition(centerY + 70f)
+        rowBlockPosition(centerY + 140f)
 
         buildBreakoutBlocks()
     }
