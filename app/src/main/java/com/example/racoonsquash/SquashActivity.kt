@@ -1,11 +1,13 @@
 package com.example.racoonsquash
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.racoonsquash.databinding.ActivitySquashBinding
 
 class SquashActivity : AppCompatActivity() {
     lateinit var binding: ActivitySquashBinding
+    private lateinit var mediaPlayer: MediaPlayer
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,9 +20,31 @@ class SquashActivity : AppCompatActivity() {
         val container = binding.root
         container.addView(gameView)
 
+
+        // Skapa en MediaPlayer-instans för att spela din MP3-fil
+        mediaPlayer = MediaPlayer.create(this, R.raw.squashbackgroundmusic)
+        mediaPlayer?.isLooping = true // Sätt till true om du vill att musiken ska loopa
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mediaPlayer?.isPlaying == false) {
+            mediaPlayer?.start() // Starta musiken när aktiviteten är synlig
+        }
+    }
 
+    override fun onPause() {
+        super.onPause()
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause() // Pausa musiken när användaren lämnar aktiviteten
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release() // Frigör resurser när aktiviteten förstörs, som mediaplayern anvander
+
+    }
 }
 
 
