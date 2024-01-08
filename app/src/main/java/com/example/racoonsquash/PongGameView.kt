@@ -256,6 +256,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
         if (checkWinCondition() == true) {
             isGameWon = true
+            soundEffect.play(7)
 
         }
 
