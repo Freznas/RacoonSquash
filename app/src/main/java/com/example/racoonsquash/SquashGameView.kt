@@ -116,7 +116,10 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             updateScore()
             soundEffect.play(4) //ljudeffekt när boll rör långsidan
         }
-        if (ballSquash.ballPositionY > height - ballSquash.ballSize){
+        if (ballSquash.ballPositionY > height - ballSquash.ballSize) {
+            soundEffect.play(4) //ljudeffekt när boll rör golvet
+        }
+        if (ballSquash.ballPositionY < 0 + ballSquash.ballSize) {
             soundEffect.play(4) //ljudeffekt när boll rör golvet
         }
     }
