@@ -8,7 +8,7 @@ class BackgroundMusic(context: Context) : Sound {
     private var mediaPlayer: MediaPlayer? = null
 
     init {
-        mediaPlayer = MediaPlayer.create(context, R.raw.background_music_start)
+        mediaPlayer = MediaPlayer.create(context, R.raw.background_music_start_140)
 
     }
 
