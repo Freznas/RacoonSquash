@@ -76,8 +76,8 @@ class MainActivity : AppCompatActivity() {
         listAdapter.notifyDataSetChanged()
 
 
-            backgroundMusic?.loopTrack(true)
-            backgroundMusic?.play(0)
+        backgroundMusic?.loopTrack(true)
+        backgroundMusic?.play(0)
 
     }
 

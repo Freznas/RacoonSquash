@@ -3,7 +3,7 @@ package com.example.racoonsquash
 import android.content.Context
 import android.media.MediaPlayer
 
-class BackgroundMusic (context: Context) : Sound {
+class BackgroundMusic(context: Context) : Sound {
 
     private var mediaPlayer: MediaPlayer? = null
 
