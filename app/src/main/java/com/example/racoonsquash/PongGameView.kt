@@ -134,17 +134,19 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     fun setupButton(pauseButton: ImageButton, playButton: ImageButton) {
         pauseButton.setOnClickListener {
+            if (!isGameWon && lives > 0) {
                 isPaused = true
                 playButton.isVisible = true
                 pauseButton.isVisible = false
-
+            }
         }
 
         playButton.setOnClickListener {
+            if (!isGameWon && lives > 0) {
                 isPaused = false
                 playButton.isVisible = false
                 pauseButton.isVisible = true
-
+            }
         }
     }
 
@@ -193,9 +195,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     fun stop() {
         running = false
-        thread?.join()
         try {
-            thread?.join() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
+            thread?.interrupt() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
@@ -256,6 +257,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
         if (checkWinCondition() == true) {
             isGameWon = true
+            soundEffect.play(7)
 
         }
 
@@ -292,6 +294,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                 update()
                 drawGameBounds(holder)
                 ballPong.checkBounds(bounds)
+            } else {
+                stop()
             }
         }
     }
@@ -305,17 +309,17 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         // Column positions
         columnBlockPosition(centerX - 400f)
-//        columnBlockPosition(centerX - 200f)
-//        columnBlockPosition(centerX)
-//        columnBlockPosition(centerX + 200f)
-//        columnBlockPosition(centerX + 400f)
+        columnBlockPosition(centerX - 200f)
+        columnBlockPosition(centerX)
+        columnBlockPosition(centerX + 200f)
+        columnBlockPosition(centerX + 400f)
 
         // Row positions
         rowBlockPosition(centerY - 140f)
-//        rowBlockPosition(centerY - 70f)
-//        rowBlockPosition(centerY)
-//        rowBlockPosition(centerY + 70f)
-//        rowBlockPosition(centerY + 140f)
+        rowBlockPosition(centerY - 70f)
+        rowBlockPosition(centerY)
+        rowBlockPosition(centerY + 70f)
+        rowBlockPosition(centerY + 140f)
 
         buildBreakoutBlocks()
     }

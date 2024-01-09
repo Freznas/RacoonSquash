@@ -12,12 +12,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gameList: MutableList<String>
     private lateinit var topScorePerGame: HashMap<String, List<DataManager.Score>>
     private lateinit var dataManager: DataManager
+    private var backgroundMusic: BackgroundMusic? = null
 
     lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        backgroundMusic = BackgroundMusic(this)
 
         binding.btnPong.setOnClickListener {
             val intent = Intent(this, PongActivity::class.java)
@@ -71,5 +74,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         listAdapter.notifyDataSetChanged()
+
+
+        backgroundMusic?.loopTrack(true)
+        backgroundMusic?.play(0)
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (backgroundMusic != null) {
+            backgroundMusic!!.pauseMedia()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        backgroundMusic?.stop()
     }
 }
