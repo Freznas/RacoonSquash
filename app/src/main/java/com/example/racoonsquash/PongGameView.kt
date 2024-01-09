@@ -9,6 +9,7 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.media.MediaPlayer
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -112,6 +113,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
+        mediaPlayer.isLooping= true
         mediaPlayer.start()
         ballPong = BallPong(context, 150f, 150f, 30f, 15f, 15f, 0)
 
