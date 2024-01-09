@@ -8,26 +8,30 @@ import com.example.racoonsquash.databinding.ActivityPongBinding
 class PongActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityPongBinding
+    lateinit var gameView: PongGameView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPongBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val surfaceHolder = binding.svPong.holder
-       // val gameView = PongGameView(this)
-        val gameView = PongGameView(this, intent.getStringExtra("userName")!!)
+        gameView = PongGameView(this, intent.getStringExtra("userName")!!)
         val container = binding.root
         container.addView(gameView)
 
-
         val pauseButton: ImageButton = binding.btnPausePong
         val playButton: ImageButton = binding.btnPlayPong
-        if (gameView != null) {
-            gameView!!.setupButton(pauseButton, playButton)
-        }
-
+        gameView.setupButton(pauseButton, playButton)
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        gameView.stop()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        gameView.stop()
+    }
 }
