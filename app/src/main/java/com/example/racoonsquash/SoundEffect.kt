@@ -6,7 +6,7 @@ import android.media.SoundPool
 class SoundEffect (context: Context) : Sound {
 
     // Soundpool-objekt med max antal ljud som kan spelas samtidigt
-    private val soundPool: SoundPool = SoundPool.Builder().setMaxStreams(5).build()
+    private val soundPool: SoundPool = SoundPool.Builder().setMaxStreams(10).build()
 
     private val bouncePaddleSound: Int = soundPool.load(context, R.raw.paddlebounce, 1)
     private val wallBounceSound: Int = soundPool.load(context, R.raw.wallbounce, 1)
