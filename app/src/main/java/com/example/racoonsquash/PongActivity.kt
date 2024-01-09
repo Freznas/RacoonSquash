@@ -27,9 +27,11 @@ class PongActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
         gameView.stop()
-        gameView.thread?.interrupt()
+    }
 
+    override fun onPause() {
+        super.onPause()
+        gameView.stop()
     }
 }

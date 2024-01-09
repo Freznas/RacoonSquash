@@ -196,7 +196,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     fun stop() {
         running = false
         try {
-            thread?.join() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
+            thread?.interrupt() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
