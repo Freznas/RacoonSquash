@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.media.MediaPlayer
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -27,6 +28,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private var rightBoundaryPath: Path? = null
     var touchColor: Paint
     var scorePaint: Paint
+    val mediaPlayer = MediaPlayer.create(context, R.raw.pongbreakout3)
 
     var isGameOver = false
     var isGameWon = false
@@ -110,7 +112,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
-
+        mediaPlayer.start()
         ballPong = BallPong(context, 150f, 150f, 30f, 15f, 15f, 0)
 
         paddle = PaddlePong(
@@ -195,6 +197,9 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     fun stop() {
         running = false
+
+        mediaPlayer.release()
+
         try {
             thread?.interrupt() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
         } catch (e: InterruptedException) {
