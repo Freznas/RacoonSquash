@@ -63,7 +63,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     private val bounceSpeedXFactor = 10.0f  // Justera detta värde efter behov
 
-    private val soundEffect = SoundEffect(context)
+    val soundEffect = SoundEffect(context)
 
     init {
         if (mHolder != null) {

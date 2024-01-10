@@ -17,15 +17,16 @@ class BackgroundMusic(context: Context) : Sound {
         mediaPlayer?.start()
     }
 
-    override fun stop() {
-        mediaPlayer?.stop()
-        releaseMediaPlayer()
-    }
-
-    private fun releaseMediaPlayer() {
+    override fun releaseResource() {
         mediaPlayer?.release()
         mediaPlayer = null
     }
+
+    override fun stop() {
+        mediaPlayer?.stop()
+        releaseResource()
+    }
+
 
     fun pauseMedia() {
         mediaPlayer?.pause()

@@ -24,7 +24,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     private var textGameOverPaint: Paint
     private var score: Int = 0;
     private var isPaused = false
-    private val soundEffect = SoundEffect(context)
+    val soundEffect = SoundEffect(context) // Behöver komma åt i activity för att frigöra resurser.
 
     //Path-klass ritar ett "spår" från en punkt moveTo() till nästa punkt lineTo()
     private var gameBoundaryPath: Path? = null

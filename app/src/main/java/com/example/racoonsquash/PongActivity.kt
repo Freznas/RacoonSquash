@@ -28,10 +28,12 @@ class PongActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         gameView.stop()
+        gameView.soundEffect.releaseResource()
     }
 
     override fun onPause() {
         super.onPause()
         gameView.stop()
+        gameView.soundEffect.releaseResource()
     }
 }

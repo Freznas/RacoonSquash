@@ -8,6 +8,7 @@ import com.example.racoonsquash.databinding.ActivitySquashBinding
 class SquashActivity : AppCompatActivity() {
     lateinit var binding: ActivitySquashBinding
     private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var gameView: SquashGameView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,8 +16,7 @@ class SquashActivity : AppCompatActivity() {
         binding = ActivitySquashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val surfaceHolder = binding.svSquash.holder
-        val gameView = SquashGameView(this, intent.getStringExtra("userName")!!)
+        gameView = SquashGameView(this, intent.getStringExtra("userName")!!)
         val container = binding.root
         container.addView(gameView)
 
@@ -38,11 +38,13 @@ class SquashActivity : AppCompatActivity() {
         if (mediaPlayer?.isPlaying == true) {
             mediaPlayer?.pause() // Pausa musiken när användaren lämnar aktiviteten
         }
+        gameView.soundEffect.releaseResource()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer?.release() // Frigör resurser när aktiviteten förstörs, som mediaplayern anvander
+        gameView.soundEffect.releaseResource()
 
     }
 }
