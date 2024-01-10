@@ -39,12 +39,14 @@ class SquashActivity : AppCompatActivity() {
             mediaPlayer?.pause() // Pausa musiken när användaren lämnar aktiviteten
         }
         gameView.soundEffect.releaseResource()
+        gameView.thread?.interrupt()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer?.release() // Frigör resurser när aktiviteten förstörs, som mediaplayern anvander
         gameView.soundEffect.releaseResource()
+        gameView.thread?.interrupt()
 
     }
 }

@@ -14,7 +14,7 @@ import android.view.SurfaceView
 
 
 class SquashGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
-    private var thread: Thread? = null
+    var thread: Thread? = null
     private var running = false
     lateinit var ballSquash: BallSquash
     lateinit var squashPad: SquashPad
