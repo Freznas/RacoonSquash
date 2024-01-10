@@ -313,7 +313,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
     private fun updateScore(): Int {
         score++
-        if (score >= 3) {
+        if (score >= 15) {
             isGameWon = true
         }
         return score
