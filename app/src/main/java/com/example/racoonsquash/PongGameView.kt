@@ -9,7 +9,6 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.media.MediaPlayer
-import android.os.Looper
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -455,7 +454,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                 )
                 // Save score
                 val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
-                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.PONG))
+                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.BREAKOUT))
 //                    stop()
             }
 
@@ -468,7 +467,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 //                )
             // Save score
             val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
-            sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.PONG))
+            sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.BREAKOUT))
 
             canvas?.drawPath(it, lineColor)
             if (ballPong.ballPositionY < 0 - ballPong.ballSize) {
