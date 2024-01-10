@@ -21,7 +21,8 @@ import kotlin.math.sqrt
 import kotlin.random.Random
 
 
-class PongGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
+class PongGameView(context: Context, private val userName: String) : SurfaceView(context),
+    SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
     var running = false
     var lineColor: Paint
@@ -55,9 +56,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
     private var lives = 3// Antal liv
-
-    // To adjust for marginTop to center the blocks (half of marginTop in function smallerSurfaceLayout)
-    private val marginOffset: Int = 75
 
     private var isPaused = false
 
@@ -113,7 +111,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
-        mediaPlayer.isLooping= true
+        mediaPlayer.isLooping = true
         mediaPlayer.start()
         ballPong = BallPong(context, 150f, 150f, 30f, 15f, 15f, 0)
 
@@ -135,6 +133,25 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         )
     }
 
+    fun resetGame() {
+
+        // If called multiple times, it gets slower every time.
+        // Does not delete block after restart
+
+        if (blockList.size < 25) {
+            synchronized(blockList) {
+                blockList.clear()
+                setBlockPositions(measuredWidth, measuredHeight)
+
+                setup()
+                //start()
+
+                score = 0
+                lives = 3
+            }
+        }
+    }
+
 
     fun setupButton(pauseButton: ImageButton, playButton: ImageButton) {
         pauseButton.setOnClickListener {
@@ -152,18 +169,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                 pauseButton.isVisible = true
             }
         }
-    }
-
-    private fun smallerSurfaceLayout(width: Int, height: Int) {
-        val margin = 150
-        val layoutParams = FrameLayout.LayoutParams(
-            width,
-            height+margin // To adjust for surfaceView
-        )
-
-        layoutParams.topMargin = margin
-
-        setLayoutParams(layoutParams)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -249,7 +254,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         if (ballPong.ballPositionY < -ballPong.ballSize) {
 
 
-
             resetBallPosition()
 
         } else if (ballPong.ballPositionY > screenHeight + ballPong.ballSize) {
@@ -309,11 +313,12 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
     }
 
-    override fun surfaceCreated(holder: SurfaceHolder) {
+
+    private fun setBlockPositions(width: Int, height: Int) {
         val blockWidth = 175f
         val blockHeight = 50f
         val centerX = (width / 2) - (blockWidth / 2)
-        val centerY = (height / 2) - marginOffset - (blockHeight / 2)
+        val centerY = (height / 2) - (blockHeight / 2)
         setup()
 
         // Column positions
@@ -331,12 +336,17 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         rowBlockPosition(centerY + 140f)
 
         buildBreakoutBlocks()
+
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        setBlockPositions(width, height)
+
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         leftBoundaryPath = createBoundaryPathLeft(width, height)
         rightBoundaryPath = createBoundaryPathRight(width, height)
-        smallerSurfaceLayout(width, height)
         bounds = Rect(0, 0, width, height)
         start()
 
@@ -399,8 +409,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
             }
 
         }
-
-
     }
 
 
@@ -454,8 +462,14 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     textGameWonPaint
                 )
                 // Save score
-                val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
-                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.PONG))
+                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
+                sharedPreferencesManager.addNewScore(
+                    DataManager.Score(
+                        this.userName,
+                        score,
+                        DataManager.Game.PONG
+                    )
+                )
 //                    stop()
             }
 
@@ -467,8 +481,14 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 //                    textGameOverPaint
 //                )
             // Save score
-            val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
-            sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.PONG))
+            val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
+            sharedPreferencesManager.addNewScore(
+                DataManager.Score(
+                    this.userName,
+                    score,
+                    DataManager.Game.PONG
+                )
+            )
 
             canvas?.drawPath(it, lineColor)
             if (ballPong.ballPositionY < 0 - ballPong.ballSize) {
@@ -509,8 +529,15 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         topPaddle.draw(canvas)
 
         //Draw all blocks
-        for (block in blockList) {
-            block.draw(canvas)
+//        for (block in blockList) {
+//            block.draw(canvas)
+//        }
+
+        synchronized(blockList) {
+            for (block in blockList) {
+                // Rita upp objektet
+                block.draw(canvas);
+            }
         }
 
 
