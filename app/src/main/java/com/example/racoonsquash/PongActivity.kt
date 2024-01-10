@@ -8,7 +8,7 @@ import com.example.racoonsquash.databinding.ActivityPongBinding
 class PongActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityPongBinding
-    lateinit var gameView: PongGameView
+    private lateinit var gameView: PongGameView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,10 +28,12 @@ class PongActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         gameView.stop()
+        gameView.soundEffect.releaseResource()
     }
 
     override fun onPause() {
         super.onPause()
         gameView.stop()
+        gameView.soundEffect.releaseResource()
     }
 }

@@ -38,6 +38,10 @@ class SoundEffect (context: Context) : Sound {
         }
     }
 
+    override fun releaseResource() {
+        soundPool.release()
+    }
+
     override fun stop() {
         soundPool.stop(audioID)
     }
