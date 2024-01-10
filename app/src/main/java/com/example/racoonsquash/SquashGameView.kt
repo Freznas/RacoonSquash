@@ -82,7 +82,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
         ballSquash = BallSquash(this.context, 100f, 100f, 30f, 20f, 20f, Color.RED, 20f)
 
-       // val drawablePaddle = resources.getDrawable(R.drawable.player_pad_a, null)
+        // val drawablePaddle = resources.getDrawable(R.drawable.player_pad_a, null)
         squashPad = SquashPad(
             this.context, 50f, 400f, 6f, 0f, 0f, 0,
             15f, 75f, 0f
@@ -141,7 +141,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     //med denna kod kan jag rora pa boll2 som star stilla annars
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-         if (event != null) {
+        if (event != null) {
             val x = event.x.toInt()
             val y = event.y.toInt()
             if (!isInsidePauseRectangule(x, y)) {
@@ -150,7 +150,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             } else if (isInsidePauseRectangule(x, y) && event.action == MotionEvent.ACTION_DOWN) {
                 // User is clicking on Pause
                 buttonPauseText = if (isPaused) context.getString(R.string.pauseText)
-                                    else context.getString(R.string.resumeText)
+                else context.getString(R.string.resumeText)
                 isPaused = !isPaused
                 drawGameBounds(holder)
             }
@@ -161,7 +161,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
     private fun isInsidePauseRectangule(x: Int, y: Int) = buttonPauseRect!!.contains(x, y)
 
-//onBallCollision inverterar riktningen på bollen när den träffar squashPad
+    //onBallCollision inverterar riktningen på bollen när den träffar squashPad
 // denna funktionen beräknar avstånd från bollens Y position och padelns Y position för att
 // bestämma vart på padeln som bollen träffar.
 // sen bestäms studsriktningen beroende på vart på padeln kollisionen sker
@@ -224,8 +224,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             canvas?.drawPath(it, lineColor)
 
             if (isGameOver()) {
-                //user loses
-
+                // User loses
                 canvas?.drawPath(it, touchColor)
                 canvas?.drawText(
                     "Score: $score",
@@ -241,10 +240,28 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
                 )
 
                 // Save score
-                val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
+                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
                 sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.SQUASH))
+            } else if (isGameWon) {
+                // Player wins
+                canvas?.drawText(
+                    "Congratz! You Won",
+                    canvas.width.toFloat() / 6,
+                    canvas.height.toFloat() / 2,
+                    textGameOverPaint
+                )
+
+                // Save score
+                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
+                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.SQUASH))
+
+                // Unlock and post canvas before stopping the game
+                holder.unlockCanvasAndPost(canvas)
+
+                stop() // Stop the game
+                return // Return early to prevent further drawing
             } else {
-                // Placera text
+                // Normal gameplay score display
                 canvas?.drawText(
                     "Score: $score",
                     canvas.width.toFloat() - 400,
@@ -254,11 +271,10 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             }
         }
 
-
         ballSquash.draw(canvas)
         squashPad.draw(canvas)
 
-        //Draw pause button
+        // Draw pause button
         if (canvas != null) {
             val buttonPauseTextLength = buttonPauseTextPaint.measureText(buttonPauseText)
             buttonPauseRect = Rect(
@@ -266,7 +282,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
                 0 + 50,
                 (canvas.width.toFloat() - 650f + buttonPauseTextLength + 10).toInt(),
                 50 + textGameOverPaint.textSize.toInt()
-            ) // x-start, y-start, x-end, y-end
+            )
 
             canvas.drawRect(buttonPauseRect!!, buttonPausePaint)
             canvas.drawText(
@@ -276,8 +292,10 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
                 buttonPauseTextPaint
             )
         }
+
         holder.unlockCanvasAndPost(canvas)
     }
+
 
     private fun isGameOver() = ballSquash.ballPositionX < 0 - ballSquash.ballSize
 
@@ -291,8 +309,13 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         return path
     }
 
+    private var isGameWon = false
+
     private fun updateScore(): Int {
         score++
+        if (score >= 3) {
+            isGameWon = true
+        }
         return score
     }
 }
