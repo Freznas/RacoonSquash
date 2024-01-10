@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
         backgroundMusic = BackgroundMusic(this)
 
-        binding.btnPong.setOnClickListener {
+        binding.btnBreakout.setOnClickListener {
             val intent = Intent(this, PongActivity::class.java)
             intent.putExtra("userName", binding.etPlayername.text.toString())
             startActivity(intent)

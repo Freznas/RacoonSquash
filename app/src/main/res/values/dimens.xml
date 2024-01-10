@@ -11,7 +11,7 @@
     <dimen name="edittext_width">296dp</dimen>
     <dimen name="main_challenge_textsize">20sp</dimen>
     <dimen name="et_playername_margin_top">172dp</dimen>
-    <dimen name="tv_main_challenge_marign">20sp</dimen>
+    <dimen name="tv_main_challenge_margin">20sp</dimen>
     <dimen name="tv_title_textsize">35sp</dimen>
     <dimen name="tv_title_margin">20sp</dimen>
     <dimen name="tv_list_group_textsize">16sp</dimen>

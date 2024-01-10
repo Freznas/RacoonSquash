@@ -21,6 +21,6 @@ interface DataManager {
 
     //Talar om alla spel i appen:
     enum class Game {
-        SQUASH, PONG
+        SQUASH, BREAKOUT
     }
 }

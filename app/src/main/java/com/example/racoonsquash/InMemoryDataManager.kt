@@ -1,7 +1,7 @@
 package com.example.racoonsquash
 
 import com.example.racoonsquash.DataManager.Game
-import com.example.racoonsquash.DataManager.Game.PONG
+import com.example.racoonsquash.DataManager.Game.BREAKOUT
 import com.example.racoonsquash.DataManager.Game.SQUASH
 import com.example.racoonsquash.DataManager.Score
 
@@ -12,9 +12,9 @@ class InMemoryDataManager : DataManager {
         Score("Bobbo", 750, SQUASH),
         Score("Dadda", 100, SQUASH),
 
-        Score("Fantus", 1000, PONG),
-        Score("Babar", 500, PONG),
-        Score("Barbapapa", 100, PONG),
+        Score("Fantus", 1000, BREAKOUT),
+        Score("Babar", 500, BREAKOUT),
+        Score("Barbapapa", 100, BREAKOUT),
     )
 
     override fun getAllScores(): List<Score> {
