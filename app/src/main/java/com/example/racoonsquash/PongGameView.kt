@@ -215,6 +215,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         if (lives <= 0) {
             soundEffect.play(2)
             isGameOver = true
+        } else {
+            soundEffect.play(8)
         }
     }
 
