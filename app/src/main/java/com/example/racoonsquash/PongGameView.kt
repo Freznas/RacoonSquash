@@ -458,17 +458,23 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 //                    stop()
             }
 
-//            if (isGameOver)
-//                canvas?.drawText(
-//                    "GAME OVER",
-//                    canvas.width.toFloat() / 3,
-//                    canvas.height.toFloat() - 300,
-//                    textGameOverPaint
-//                )
-            // Save score
-            val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
-            sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.BREAKOUT))
-
+            if (isGameOver) {
+                canvas?.drawText(
+                    "GAME OVER",
+                    canvas.width.toFloat() / 3,
+                    canvas.height.toFloat() - 300,
+                    textGameOverPaint
+                )
+                // Save score
+                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
+                sharedPreferencesManager.addNewScore(
+                    DataManager.Score(
+                        this.userName,
+                        score,
+                        DataManager.Game.BREAKOUT
+                    )
+                )
+            }
             canvas?.drawPath(it, lineColor)
             if (ballPong.ballPositionY < 0 - ballPong.ballSize) {
                 canvas?.drawPath(it, touchColor)
