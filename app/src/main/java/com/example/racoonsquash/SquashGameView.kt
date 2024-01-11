@@ -250,7 +250,6 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
                     canvas.height.toFloat() / 2,
                     textGameOverPaint
                 )
-
                 // Save score
                 val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
                 sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.SQUASH))
@@ -315,6 +314,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         score++
         if (score >= 15) {
             isGameWon = true
+            soundEffect.play(9)
         }
         return score
     }
