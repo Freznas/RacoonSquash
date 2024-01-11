@@ -28,12 +28,11 @@ class PongActivity : AppCompatActivity() {
         val restartButton: ImageButton = binding.btnRestartPong
         val pauseButton: ImageButton = binding.btnPausePong
         val playButton: ImageButton = binding.btnPlayPong
-        gameView.setupButton(pauseButton, playButton)
+        gameView.setupButtons(pauseButton, playButton)
 
         restartButton.setOnClickListener {
             restartActivity()
         }
-
     }
 
     override fun onDestroy() {
@@ -47,6 +46,6 @@ class PongActivity : AppCompatActivity() {
     }
 
     private fun restartActivity() {
-        gameView.resetGame()
+        gameView.restartGame()
     }
 }

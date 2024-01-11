@@ -9,12 +9,11 @@ import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.media.MediaPlayer
-import android.os.Looper
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.core.view.isVisible
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -31,6 +30,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     var touchColor: Paint
     var scorePaint: Paint
     val mediaPlayer = MediaPlayer.create(context, R.raw.pongbreakout3)
+
+    private lateinit var pauseButton: ImageButton
 
     var isGameOver = false
     var isGameWon = false
@@ -133,28 +134,30 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         )
     }
 
-    fun resetGame() {
+    fun restartGame() {
+        if (running) {
+            // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
+            blockList.clear()
+            buildBreakoutBlocks()
+            setup()
 
-        // If called multiple times, it gets slower every time.
-        // Does not delete block after restart
+            score = 0
+            lives = 3
 
-        if (blockList.size < 25) {
-            synchronized(blockList) {
-                blockList.clear()
-                setBlockPositions(measuredWidth, measuredHeight)
-
-                setup()
-                //start()
-
-                score = 0
-                lives = 3
+            if (isPaused) {
+                isPaused = false
+                pauseButton.isVisible = true
             }
+
+        } else {
+            Toast.makeText(this.context, "Cant restart at game over...", Toast.LENGTH_LONG).show()
         }
     }
 
 
-    fun setupButton(pauseButton: ImageButton, playButton: ImageButton) {
+    fun setupButtons(pauseButton: ImageButton, playButton: ImageButton) {
         pauseButton.setOnClickListener {
+            this.pauseButton = pauseButton
             if (!isGameWon && lives > 0) {
                 isPaused = true
                 playButton.isVisible = true
@@ -196,7 +199,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     fun start() {
 
         running = true
-        thread = Thread(this) //en trad har en konstruktor som tar in en runnable,
+        thread = Thread(this)//en trad har en konstruktor som tar in en runnable,
         // vilket sker i denna klass se rad 10
         thread?.start()
 
@@ -307,8 +310,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                 update()
                 drawGameBounds(holder)
                 ballPong.checkBounds(bounds)
-            } else {
-                stop()
             }
         }
     }
@@ -528,16 +529,9 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         paddle.draw(canvas!!)
         topPaddle.draw(canvas)
 
-        //Draw all blocks
-//        for (block in blockList) {
-//            block.draw(canvas)
-//        }
-
-        synchronized(blockList) {
-            for (block in blockList) {
-                // Rita upp objektet
-                block.draw(canvas);
-            }
+        // Draw all blocks
+        for (block in blockList) {
+            block.draw(canvas)
         }
 
 
