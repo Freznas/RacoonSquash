@@ -118,7 +118,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         paddle = PaddlePong(
             context,
             screenWidth / 2f,
-            screenHeight - 220f,  // for bottom paddle (Had to change for the smaller size) // JH
+            screenHeight - 300f,  // for bottom paddle (Had to change for the smaller size) // JH
             180f,
             20f,
             Color.parseColor("#FFFF00")
@@ -157,9 +157,11 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
             // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
             blockList.clear()
             buildBreakoutBlocks()
-            setup()
+
             score = 0
             lives = 3
+
+            setup()
 
             if (isPaused) {
                 isPaused = false
