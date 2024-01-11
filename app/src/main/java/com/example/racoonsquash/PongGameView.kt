@@ -1,6 +1,5 @@
 package com.example.racoonsquash
 
-
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -12,8 +11,8 @@ import android.media.MediaPlayer
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.core.view.isVisible
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -43,6 +42,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     lateinit var ballPong: BallPong
     var bounds = Rect()
     var mHolder: SurfaceHolder? = holder
+
+    private lateinit var pauseButton: ImageButton
 //    private val initialBallPosX = 500f
 //    private val initialBallPosY = 700f
 
@@ -55,8 +56,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val initialBallPosYForBottom = 500f
     private var lives = 3// Antal liv
 
-    // To adjust for marginTop to center the blocks (half of marginTop in function smallerSurfaceLayout)
-    private val marginOffset: Int = 75
 
     private var isPaused = false
 
@@ -135,15 +134,15 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
 
-    fun setupButton(pauseButton: ImageButton, playButton: ImageButton) {
+    fun setupButtons(pauseButton: ImageButton, playButton: ImageButton) {
         pauseButton.setOnClickListener {
+            this.pauseButton = pauseButton
             if (!isGameWon && lives > 0) {
                 isPaused = true
                 playButton.isVisible = true
                 pauseButton.isVisible = false
             }
         }
-
         playButton.setOnClickListener {
             if (!isGameWon && lives > 0) {
                 isPaused = false
@@ -153,16 +152,23 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
     }
 
-    private fun smallerSurfaceLayout(width: Int, height: Int) {
-        val margin = 150
-        val layoutParams = FrameLayout.LayoutParams(
-            width,
-            height+margin // To adjust for surfaceView
-        )
+    fun restartGame() {
+        if (running) {
+            // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
+            blockList.clear()
+            buildBreakoutBlocks()
+            setup()
+            score = 0
+            lives = 3
 
-        layoutParams.topMargin = margin
+            if (isPaused) {
+                isPaused = false
+                pauseButton.isVisible = true
+            }
 
-        setLayoutParams(layoutParams)
+        } else {
+            Toast.makeText(this.context, "Cant restart at game over...", Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -302,8 +308,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                 update()
                 drawGameBounds(holder)
                 ballPong.checkBounds(bounds)
-            } else {
-                stop()
             }
         }
     }
@@ -312,7 +316,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         val blockWidth = 175f
         val blockHeight = 50f
         val centerX = (width / 2) - (blockWidth / 2)
-        val centerY = (height / 2) - marginOffset - (blockHeight / 2)
+        val centerY = (height / 2) - (blockHeight / 2)
         setup()
 
         // Column positions
@@ -335,7 +339,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         leftBoundaryPath = createBoundaryPathLeft(width, height)
         rightBoundaryPath = createBoundaryPathRight(width, height)
-        smallerSurfaceLayout(width, height)
         bounds = Rect(0, 0, width, height)
         start()
 
