@@ -154,9 +154,13 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     fun restartGame() {
         if (running) {
-            // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
-            blockList.clear()
-            buildBreakoutBlocks()
+
+            synchronized (blockList) {
+                // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
+                blockList.clear()
+                buildBreakoutBlocks()
+
+            }
 
             score = 0
             lives = 3
@@ -389,19 +393,21 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
     private fun checkBallBlockCollision() {
-        for (block in blockList) {
-            if (onBlockCollision(block, ballPong)) {
-                ballPong.ballSpeedY *= -1
+        synchronized(blockList) {
+            for (block in blockList) {
+                if (onBlockCollision(block, ballPong)) {
+                    ballPong.ballSpeedY *= -1
 
-                score++
+                    score++
 
-                soundEffect.play(3)
+                    soundEffect.play(3)
 
-                isGameWon = deleteBlockInList(block)
+                    isGameWon = deleteBlockInList(block)
 
-                break
+                    break
+                }
+
             }
-
         }
 
 
@@ -518,9 +524,11 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         paddle.draw(canvas!!)
         topPaddle.draw(canvas)
 
-        //Draw all blocks
-        for (block in blockList) {
-            block.draw(canvas)
+        synchronized(blockList) {
+            //Draw all blocks
+            for (block in blockList) {
+                block.draw(canvas)
+            }
         }
 
 
