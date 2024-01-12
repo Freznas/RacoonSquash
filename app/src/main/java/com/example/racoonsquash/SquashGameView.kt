@@ -14,7 +14,7 @@ import android.view.SurfaceView
 
 
 class SquashGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
-    private var thread: Thread? = null
+    var thread: Thread? = null
     private var running = false
     lateinit var ballSquash: BallSquash
     lateinit var squashPad: SquashPad
@@ -24,7 +24,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     private var textGameOverPaint: Paint
     private var score: Int = 0;
     private var isPaused = false
-    private val soundEffect = SoundEffect(context)
+    val soundEffect = SoundEffect(context) // Behöver komma åt i activity för att frigöra resurser.
 
     //Path-klass ritar ett "spår" från en punkt moveTo() till nästa punkt lineTo()
     private var gameBoundaryPath: Path? = null
@@ -211,8 +211,13 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         val bounceAngle =
             normalizedIntersectY * Math.PI / 7
 
-        ballSquash1.ballSpeedX = (ballSquash1.speed * Math.cos(bounceAngle)).toFloat()
-        ballSquash1.ballSpeedY = (-ballSquash1.speed * Math.sin(bounceAngle)).toFloat()
+        val randomSpeed = (15..45).random().toFloat()
+        ballSquash1.ballSpeedX = (randomSpeed * Math.cos(bounceAngle)).toFloat()
+        ballSquash1.ballSpeedY = (-randomSpeed * Math.sin(bounceAngle)).toFloat()
+        // För att få slumpmässig hastighet vid kollision mellan boll o paddel ta koden ↑
+        //För att ha en hastighet så ta koden ↓
+//        ballSquash1.ballSpeedX = (ballSquash1.speed * Math.cos(bounceAngle)).toFloat()
+//        ballSquash1.ballSpeedY = (-ballSquash1.speed * Math.sin(bounceAngle)).toFloat()
     }
 
     // här tar vi in storlek från ball och squashPad och kontrollerar när en kollision sker
@@ -288,7 +293,6 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
                     canvas.height.toFloat() / 2,
                     textGameOverPaint
                 )
-
                 // Save score
                 val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
                 sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.SQUASH))
@@ -371,7 +375,14 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         score++
         if (score >= 15) {
             isGameWon = true
+            soundEffect.play(9)
         }
         return score
     }
 }
+
+//        if ()
+//        {
+//            ballSquash1.ballSpeedY *= -1
+//            ballSquash1.ballSpeedX= (10..30).random().toFloat()
+//        }
