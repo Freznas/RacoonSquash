@@ -15,6 +15,14 @@ open class BallSquash(
     var speed: Float
 ) : Ball(context, posX, posY, size, speedX, speedY, color) {
 
+    // Initial values
+    private val initialPosX = posX
+    private val initialPosY = posY
+    private val initialSize = size
+    private val initialSpeedX = speedX
+    private val initialSpeedY = speedY
+    private val initialColor = color
+
     init {
         paint.color = color
     }
@@ -41,6 +49,15 @@ open class BallSquash(
 
     override fun draw(canvas: Canvas?) {
         canvas?.drawCircle(ballPositionX, ballPositionY, ballSize, paint)
+    }
+
+    open fun reset() {
+        ballPositionX = initialPosX
+        ballPositionY = initialPosY
+        ballSize = initialSize
+        ballSpeedX = initialSpeedX
+        ballSpeedY = initialSpeedY
+        paint.color = initialColor
     }
 
 }
