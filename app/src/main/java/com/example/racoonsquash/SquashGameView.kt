@@ -173,8 +173,13 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         val bounceAngle =
             normalizedIntersectY * Math.PI / 7
 
-        ballSquash1.ballSpeedX = (ballSquash1.speed * Math.cos(bounceAngle)).toFloat()
-        ballSquash1.ballSpeedY = (-ballSquash1.speed * Math.sin(bounceAngle)).toFloat()
+        val randomSpeed = (15..45).random().toFloat()
+        ballSquash1.ballSpeedX = (randomSpeed * Math.cos(bounceAngle)).toFloat()
+        ballSquash1.ballSpeedY = (-randomSpeed * Math.sin(bounceAngle)).toFloat()
+        // För att få slumpmässig hastighet vid kollision mellan boll o paddel ta koden ↑
+        //För att ha en hastighet så ta koden ↓
+//        ballSquash1.ballSpeedX = (ballSquash1.speed * Math.cos(bounceAngle)).toFloat()
+//        ballSquash1.ballSpeedY = (-ballSquash1.speed * Math.sin(bounceAngle)).toFloat()
     }
 
     // här tar vi in storlek från ball och squashPad och kontrollerar när en kollision sker
@@ -319,3 +324,9 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         return score
     }
 }
+
+//        if ()
+//        {
+//            ballSquash1.ballSpeedY *= -1
+//            ballSquash1.ballSpeedX= (10..30).random().toFloat()
+//        }
