@@ -16,8 +16,6 @@ import androidx.core.view.isVisible
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
-import android.os.Handler;
-import android.os.Looper;
 
 
 class PongGameView(context: Context, private val userName: String) : SurfaceView(context),
