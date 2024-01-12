@@ -12,14 +12,16 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.core.view.isVisible
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
+import android.os.Handler;
+import android.os.Looper;
 
 
-class PongGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
+class PongGameView(context: Context, private val userName: String) : SurfaceView(context),
+    SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
     var running = false
     var lineColor: Paint
@@ -31,8 +33,12 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     var isGameOver = false
     var isGameWon = false
+
+    var isGameReset = false
+
     lateinit var textGameWonPaint: Paint
     private var textGameOverPaint: Paint
+
 
     //    private var scorePlayerTop = 0
 //    private var scorePlayerBottom = 0
@@ -55,7 +61,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
     private var lives = 3// Antal liv
-
 
     private var isPaused = false
 
@@ -111,8 +116,16 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
-        mediaPlayer.isLooping= true
-        mediaPlayer.start()
+        // Behöver anropa setup vid restart för att återställa paddlar och bollen när spelet startas om.
+        // Problemet blir att mediaplayern anropas varje gång och hittar inte referensen till den.
+        // Det går inte att lägga in referensen här heller tyvärr, för då skapas en massa mediaplayer-objekt
+        // vid varje tryck.
+        // Lade media-player i pongActivity istället ut-kommenterat. Ta bort de som kommentarer i PongActivity.
+        // Visste inte hur jag skulle lösa det...
+//        mediaPlayer.isLooping = true
+//        mediaPlayer.start()
+        isGameReset = false
+
         ballPong = BallPong(context, 150f, 150f, 30f, 15f, 15f, 0)
 
         paddle = PaddlePong(
@@ -131,6 +144,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
             20f,
             Color.parseColor("#FFFF00")
         )
+        isGameWon = false
     }
 
 
@@ -153,28 +167,25 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
     fun restartGame() {
-        if (running) {
+        isGameReset = true
 
-            synchronized (blockList) {
-                // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
-                blockList.clear()
-                buildBreakoutBlocks()
+        score = 0
+        lives = 3
 
-            }
+        setup()
 
-            score = 0
-            lives = 3
-
-            setup()
-
-            if (isPaused) {
-                isPaused = false
-                pauseButton.isVisible = true
-            }
-
-        } else {
-            Toast.makeText(this.context, "Cant restart at game over...", Toast.LENGTH_LONG).show()
+        if (isPaused) {
+            isPaused = false
+            pauseButton.isVisible = true
         }
+
+        synchronized(blockList) {
+            // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
+            blockList.clear()
+            buildBreakoutBlocks()
+        }
+
+        start()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -258,7 +269,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
 
         if (ballPong.ballPositionY < -ballPong.ballSize) {
-
 
 
             resetBallPosition()
@@ -456,7 +466,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         canvas?.drawText(livesText, 20f, 100f, scorePaint)
 
         rightBoundaryPath?.let {
-            if (isGameWon) {
+            if (isGameWon && !isGameReset) {
                 canvas?.drawText(
                     "CONGRATZ",
                     canvas.width.toFloat() / 3,
@@ -464,12 +474,18 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     textGameWonPaint
                 )
                 // Save score
-                val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
-                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.BREAKOUT))
+                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
+                sharedPreferencesManager.addNewScore(
+                    DataManager.Score(
+                        this.userName,
+                        score,
+                        DataManager.Game.BREAKOUT
+                    )
+                )
 //                    stop()
             }
 
-            if (isGameOver) {
+            if (isGameOver && isGameReset) {
                 canvas?.drawText(
                     "GAME OVER",
                     canvas.width.toFloat() / 3,

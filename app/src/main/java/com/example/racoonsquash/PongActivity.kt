@@ -1,5 +1,6 @@
 package com.example.racoonsquash
 
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.FrameLayout
@@ -11,15 +12,14 @@ class PongActivity : AppCompatActivity() {
     lateinit var binding: ActivityPongBinding
     private lateinit var gameView: PongGameView
 
+   // 1 av 6 private lateinit var mediaPlayer: MediaPlayer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPongBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         gameView = PongGameView(this, intent.getStringExtra("userName")!!)
-
-        //        val container = binding.root
-        //        container.addView(gameView)
 
         val frameLayoutContainer: FrameLayout = binding.root.findViewById(R.id.frame_sv)
 
@@ -35,18 +35,24 @@ class PongActivity : AppCompatActivity() {
             restartActivity()
         }
 
+        // 2 av 6 mediaPlayer = MediaPlayer.create(this, R.raw.pongbreakout3)
+        // 3 av 6 mediaPlayer.isLooping = true
+        // 4 av 6 mediaPlayer.start()
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
         gameView.stop()
         gameView.soundEffect.releaseResource()
+        // 5 av 6 mediaPlayer.release()
     }
 
     override fun onPause() {
         super.onPause()
         gameView.stop()
         gameView.soundEffect.releaseResource()
+        // 6 av 6 mediaPlayer.pause()
     }
     private fun restartActivity() {
         gameView.restartGame()
