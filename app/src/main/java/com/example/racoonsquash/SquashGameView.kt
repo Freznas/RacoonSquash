@@ -45,6 +45,18 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     }
     private var buttonPauseText = context.getString(R.string.pauseText)
 
+    private var buttonRestartRect: Rect? = null
+    private val buttonRestartPaint = Paint().apply {
+        color = Color.YELLOW
+        alpha = 100
+    }
+    private val buttonRestartTextPaint = Paint().apply {
+        color = Color.WHITE
+        textSize = 60.0F
+        typeface = Typeface.create("serif-monospace", Typeface.BOLD)
+    }
+    private var buttonRestartText = "Restart"
+
     init {
         if (mHolder != null) {
             mHolder?.addCallback(this)
@@ -76,6 +88,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         }
         setup()
     }
+
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun setup() {
@@ -144,15 +157,19 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         if (event != null) {
             val x = event.x.toInt()
             val y = event.y.toInt()
-            if (!isInsidePauseRectangule(x, y)) {
-                // User is not clicking on pause
-                squashPad.ballPositionY = event.y // Move pad
-            } else if (isInsidePauseRectangule(x, y) && event.action == MotionEvent.ACTION_DOWN) {
+
+            if (isInsidePauseRectangule(x, y) && event.action == MotionEvent.ACTION_DOWN) {
                 // User is clicking on Pause
                 buttonPauseText = if (isPaused) context.getString(R.string.pauseText)
                 else context.getString(R.string.resumeText)
                 isPaused = !isPaused
                 drawGameBounds(holder)
+            } else if (isInsideRestartRectangle(x, y) && event.action == MotionEvent.ACTION_DOWN) {
+                // User is clicking on Restart
+                restartGame()
+            } else {
+                // User is not clicking on pause or restart - handle other touch events
+                squashPad.ballPositionY = event.y // Move pad
             }
             return true
         }
@@ -160,6 +177,27 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     }
 
     private fun isInsidePauseRectangule(x: Int, y: Int) = buttonPauseRect!!.contains(x, y)
+
+    private fun isInsideRestartRectangle(x: Int, y: Int): Boolean {
+        // Implement this method to return true if the (x, y) coordinates are inside the restart button rectangle
+        return buttonRestartRect?.contains(x, y) ?: false
+    }
+
+    private fun restartGame() {
+        score = 0
+        isGameWon = false
+        isPaused = false
+        // Reset ball position, speed, and paddle size
+        ballSquash.reset() // Implement this method in your BallSquash class
+        //squashPad.reset() // Implement this method in your SquashPad class
+
+        squashPad.ballPositionX = 50f // Initial X position as defined in setup()
+        squashPad.ballPositionY = 400f // Initial Y position as defined in setup()
+
+        buttonPauseText = context.getString(R.string.pauseText)
+
+        drawGameBounds(holder)
+    }
 
     //onBallCollision inverterar riktningen på bollen när den träffar squashPad
 // denna funktionen beräknar avstånd från bollens Y position och padelns Y position för att
@@ -290,6 +328,24 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
                 buttonPauseRect!!.left.toFloat() + 5,
                 buttonPauseRect!!.top.toFloat() + buttonPauseTextPaint.textSize - 10,
                 buttonPauseTextPaint
+            )
+        }
+
+        if (canvas != null) {
+            val buttonRestartTextLength = buttonRestartTextPaint.measureText(buttonRestartText)
+            buttonRestartRect = Rect(
+                buttonPauseRect!!.left - buttonRestartTextLength.toInt() - 30, // 30 is the space between the buttons
+                buttonPauseRect!!.top,
+                buttonPauseRect!!.left - 10, // 10 is for padding
+                buttonPauseRect!!.bottom
+            )
+
+            canvas.drawRect(buttonRestartRect!!, buttonRestartPaint)
+            canvas.drawText(
+                buttonRestartText,
+                buttonRestartRect!!.left.toFloat() + 5,
+                buttonRestartRect!!.top.toFloat() + buttonRestartTextPaint.textSize - 10,
+                buttonRestartTextPaint
             )
         }
 
