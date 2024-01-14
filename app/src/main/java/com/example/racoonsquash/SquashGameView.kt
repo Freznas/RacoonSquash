@@ -13,7 +13,8 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 
 
-class SquashGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
+class SquashGameView(context: Context, private val userName: String) : SurfaceView(context),
+    SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
     private var running = false
     lateinit var ballSquash: BallSquash
@@ -32,7 +33,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     var bounds = Rect() //for att kunna studsa m vaggarna
     var mHolder: SurfaceHolder? = holder
 
-    private var buttonPauseRect :Rect? = null
+    private var buttonPauseRect: Rect? = null
     private val buttonPausePaint = Paint().apply {
         //This could be transparent if no rectangle is wanted to be shown
         color = Color.YELLOW
@@ -211,6 +212,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         val bounceAngle =
             normalizedIntersectY * Math.PI / 7
 
+
         val randomSpeed = (15..45).random().toFloat()
         ballSquash1.ballSpeedX = (randomSpeed * Math.cos(bounceAngle)).toFloat()
         ballSquash1.ballSpeedY = (-randomSpeed * Math.sin(bounceAngle)).toFloat()
@@ -284,7 +286,13 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
                 // Save score
                 val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
-                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.SQUASH))
+                sharedPreferencesManager.addNewScore(
+                    DataManager.Score(
+                        this.userName,
+                        score,
+                        DataManager.Game.SQUASH
+                    )
+                )
             } else if (isGameWon) {
                 // Player wins
                 canvas?.drawText(
@@ -295,7 +303,13 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
                 )
                 // Save score
                 val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
-                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.SQUASH))
+                sharedPreferencesManager.addNewScore(
+                    DataManager.Score(
+                        this.userName,
+                        score,
+                        DataManager.Game.SQUASH
+                    )
+                )
 
                 // Unlock and post canvas before stopping the game
                 holder.unlockCanvasAndPost(canvas)
