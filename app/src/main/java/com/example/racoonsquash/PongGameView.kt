@@ -11,14 +11,14 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.core.view.isVisible
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
 
 
-class PongGameView(context: Context, private val userName: String) : SurfaceView(context), SurfaceHolder.Callback, Runnable {
+class PongGameView(context: Context, private val userName: String) : SurfaceView(context),
+    SurfaceHolder.Callback, Runnable {
     var thread: Thread? = null
     var running = false
     var lineColor: Paint
@@ -29,6 +29,9 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     var isGameOver = false
     var isGameWon = false
+
+    var isGameReset = false
+
     var textGameWonPaint: Paint
     private var textGameOverPaint: Paint
 
@@ -109,6 +112,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val screenHeight = resources.displayMetrics.heightPixels
 
     private fun setup() {
+        isGameReset = false
 
         ballPong = BallPong(context, 150f, 150f, 30f, 15f, 15f, 0)
 
@@ -128,6 +132,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
             20f,
             Color.parseColor("#FFFF00")
         )
+        isGameWon = false
     }
 
 
@@ -150,24 +155,23 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
     fun restartGame() {
-        if (running) {
+        isGameReset = true
+        score = 0
+        lives = 3
+
+        setup()
+
+        if (isPaused) {
+            isPaused = false
+            pauseButton.isVisible = true
+        }
+
+        synchronized(blockList) {
             // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
             blockList.clear()
             buildBreakoutBlocks()
-
-            score = 0
-            lives = 3
-
-            setup()
-
-            if (isPaused) {
-                isPaused = false
-                pauseButton.isVisible = true
-            }
-
-        } else {
-            Toast.makeText(this.context, "Cant restart at game over...", Toast.LENGTH_LONG).show()
         }
+        start()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -251,7 +255,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
 
         if (ballPong.ballPositionY < -ballPong.ballSize) {
-
 
 
             resetBallPosition()
@@ -387,17 +390,19 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
     private fun checkBallBlockCollision() {
-        for (block in blockList) {
-            if (onBlockCollision(block, ballPong)) {
-                ballPong.ballSpeedY *= -1
+        synchronized(blockList) {
+            for (block in blockList) {
+                if (onBlockCollision(block, ballPong)) {
+                    ballPong.ballSpeedY *= -1
 
-                score++
+                    score++
 
-                soundEffect.play(3)
+                    soundEffect.play(3)
 
-                isGameWon = deleteBlockInList(block)
+                    isGameWon = deleteBlockInList(block)
 
-                break
+                    break
+                }
             }
 
         }
@@ -448,7 +453,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         canvas?.drawText(livesText, 20f, 100f, scorePaint)
 
         rightBoundaryPath?.let {
-            if (isGameWon) {
+            if (isGameWon && !isGameReset) {
                 canvas?.drawText(
                     "CONGRATZ",
                     canvas.width.toFloat() / 3,
@@ -456,12 +461,18 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     textGameWonPaint
                 )
                 // Save score
-                val sharedPreferencesManager : DataManager = SharedPreferencesManager(context)
-                sharedPreferencesManager.addNewScore(DataManager.Score(this.userName, score, DataManager.Game.BREAKOUT))
+                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
+                sharedPreferencesManager.addNewScore(
+                    DataManager.Score(
+                        this.userName,
+                        score,
+                        DataManager.Game.BREAKOUT
+                    )
+                )
 //                    stop()
             }
 
-            if (isGameOver) {
+            if (isGameOver && isGameReset) {
                 canvas?.drawText(
                     "GAME OVER",
                     canvas.width.toFloat() / 3,
@@ -516,9 +527,10 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         paddle.draw(canvas!!)
         topPaddle.draw(canvas)
 
-        //Draw all blocks
-        for (block in blockList) {
-            block.draw(canvas)
+        synchronized(blockList) {
+            for (block in blockList) {
+                block.draw(canvas)
+            }
         }
 
 
