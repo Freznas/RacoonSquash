@@ -303,11 +303,21 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
     }
 
+    private fun setTransparentPaddle(paddle: PaddlePong) {
+        when (lives) {
+            2 -> paddle.setPaddleTransparency(paddle, 80)
+            1 -> paddle.setPaddleTransparency(paddle, 40)
+            else -> paddle.setPaddleTransparency(paddle, 255)
+        }
+    }
+
 
     override fun run() {
         while (running) {
             if (!isPaused) {
                 update()
+                setTransparentPaddle(paddle)
+                setTransparentPaddle(topPaddle)
                 drawGameBounds(holder)
                 ballPong.checkBounds(bounds)
             }
