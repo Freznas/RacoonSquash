@@ -387,7 +387,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
     private fun updateScore(): Int {
         score++
-        if (score >= 15) {
+        if (score >= 5) {
             isGameWon = true
             soundEffect.play(9)
         }
