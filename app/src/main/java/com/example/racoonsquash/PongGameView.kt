@@ -365,8 +365,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                 "BlockDebug",
                 "Respawned block at posX: ${randomBlock.posX}, posY: ${randomBlock.posY}"
             )
-
-            blockList.add(randomBlock)
+            buildBreakoutBlocks()
+//            blockList.add(randomBlock)
         }
     }
 
@@ -490,7 +490,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     this.userName,
                     score,
                     DataManager.Game.BREAKOUT
-                ))
+                )
+            )
 
 
             /* if (isGameWon && !isGameReset) {
