@@ -57,6 +57,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val initialBallPosYForBottom = 500f
     private var lives = 3// Antal liv
 
+    private var soundEffectsList: MutableList<Int> = mutableListOf()
 
     private var isPaused = false
 
@@ -68,6 +69,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         if (mHolder != null) {
             mHolder?.addCallback(this)
         }
+
+       soundEffect.loadPongSoundEffects(soundEffectsList)
 
         lineColor = Paint().apply {
             color = Color.CYAN
@@ -220,10 +223,10 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private fun loseLife() {
         lives--
         if (lives <= 0) {
-            soundEffect.play(2)
+            soundEffect.play(soundEffectsList[2])
             isGameOver = true
         } else {
-            soundEffect.play(8)
+            soundEffect.play(soundEffectsList[5])
         }
     }
 
@@ -243,13 +246,13 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         // Check collision with the bottom paddle
         if (isBallCollidingWithPaddle(ballPong, paddle)) {
-            soundEffect.play(0)
+            soundEffect.play(soundEffectsList[0])
             handleBallPaddleCollision(ballPong, paddle)
         }
 
         // Check collision with the top paddle
         if (isBallCollidingWithPaddle(ballPong, topPaddle)) {
-            soundEffect.play(0)
+            soundEffect.play(soundEffectsList[0])
             handleBallPaddleCollision(ballPong, topPaddle)
         }
 
@@ -273,7 +276,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
         if (checkWinCondition() == true) {
             isGameWon = true
-            soundEffect.play(7)
+            soundEffect.play(soundEffectsList[4])
 
         }
 
@@ -407,7 +410,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
                     score++
 
-                    soundEffect.play(3)
+                    soundEffect.play(soundEffectsList[3])
 
                     isGameWon = deleteBlockInList(block)
 
