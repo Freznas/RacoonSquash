@@ -25,6 +25,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     private var textGameOverPaint: Paint
     private var score: Int = 0;
     private var isPaused = false
+    private var soundEffectsList: MutableList<Int> = mutableListOf()
     val soundEffect = SoundEffect(context) // Behöver komma åt i activity för att frigöra resurser.
 
     //Path-klass ritar ett "spår" från en punkt moveTo() till nästa punkt lineTo()
@@ -62,6 +63,8 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         if (mHolder != null) {
             mHolder?.addCallback(this)
         }
+
+        soundEffect.loadSquashSoundEffects(soundEffectsList)
 
         // Score-text-färg-attribut
         scorePaint = Paint().apply {
@@ -128,13 +131,13 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         // Räknar bara när boll rör långsidan just nu
         if (ballSquash.ballPositionX > width - ballSquash.ballSize) {
             updateScore()
-            soundEffect.play(4) //ljudeffekt när boll rör långsidan
+// TODO 1 av 5   soundEffect.play(soundEffectsList[0]) //ljudeffekt när boll rör långsidan
         }
         if (ballSquash.ballPositionY > height - ballSquash.ballSize) {
-            soundEffect.play(4) //ljudeffekt när boll rör golvet
+// TODO 2 av 5   soundEffect.play(soundEffectsList[0]) //ljudeffekt när boll rör golvet
         }
         if (ballSquash.ballPositionY < 0 + ballSquash.ballSize) {
-            soundEffect.play(4) //ljudeffekt när boll rör golvet
+// TODO 3 av 5   soundEffect.play(soundEffectsList[0]) //ljudeffekt när boll rör golvet
         }
     }
 
@@ -237,7 +240,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             padBottom
         ) {
             onBallCollision(ballSquash1, squashPad)
-            soundEffect.play(5) //ljudeffekt när boll rör pad
+// TODO 4 av 5   soundEffect.play(soundEffectsList[1]) //ljudeffekt när boll rör pad
         }
     }
 
@@ -389,10 +392,10 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         score++
         if (score >= 3) {
             isGameWon = true
-            soundEffect.play(9)
+// TODO 5 av 5   soundEffect.play(soundEffectsList[3])
             return score
         }else{(score <= 0)
-            soundEffect.play(6)
+//            soundEffect.play(soundEffectsList[2])
         }
         return score
     }
