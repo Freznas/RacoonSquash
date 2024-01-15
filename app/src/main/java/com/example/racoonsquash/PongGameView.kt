@@ -70,8 +70,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
             mHolder?.addCallback(this)
         }
 
-       soundEffect.loadPongSoundEffects(soundEffectsList)
-
         lineColor = Paint().apply {
             color = Color.CYAN
             style = Paint.Style.STROKE
@@ -158,6 +156,11 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
     fun restartGame() {
+        stop()
+        soundEffect.stop()
+        soundEffect.releaseResource()
+        soundEffectsList.clear()
+
         isGameReset = true
         score = 0
         lives = 3
@@ -200,18 +203,17 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
 
     fun start() {
-
         running = true
         thread = Thread(this) //en trad har en konstruktor som tar in en runnable,
         // vilket sker i denna klass se rad 10
+        soundEffect.reBuild()
+        soundEffect.loadPongSoundEffects(soundEffectsList)
         thread?.start()
 
     }
 
     fun stop() {
         running = false
-
-
         try {
             thread?.interrupt() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
         } catch (e: InterruptedException) {
@@ -295,12 +297,12 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         if (ballPong.ballPositionY < -ballPong.ballSize) {
             loseLife()
-            Thread.sleep(0)
+            //Thread.sleep(0)
             ballPong.ballPositionX = initialBallPosXForTop
             ballPong.ballPositionY = initialBallPosYForTop
         } else if (ballPong.ballPositionY > screenHeight - ballPong.ballSize) {
             loseLife()
-            Thread.sleep(0)
+            //Thread.sleep(0)
             ballPong.ballPositionX = initialBallPosXForBottom
             ballPong.ballPositionY = initialBallPosYForBottom
         }

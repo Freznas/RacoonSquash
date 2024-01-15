@@ -24,6 +24,12 @@ class SoundEffect(val context: Context) : Sound {
         soundPool?.stop(audioID)
     }
 
+    fun reBuild() {
+        if (soundPool == null) {
+            soundPool = SoundPool.Builder().setMaxStreams(10).build()
+        }
+    }
+
     private fun getResource(resource: Int): Int {
         return when (resource) {
             0 -> R.raw.paddlebounce
