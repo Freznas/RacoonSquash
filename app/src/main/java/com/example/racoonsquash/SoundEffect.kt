@@ -38,10 +38,10 @@ class SoundEffect(val context: Context) : Sound {
             3 -> R.raw.up
             4 -> R.raw.win
             5 -> R.raw.lost
-            6 -> R.raw.squashbounce
-            7 -> R.raw.squashbouncy
-            8 -> R.raw.squashfailure
-            9 -> R.raw.squashsuccessfanfare
+            6 -> R.raw.squashbounce // 0
+            7 -> R.raw.squashbouncy // 1
+            8 -> R.raw.squashfailure //2
+            9 -> R.raw.squashsuccessfanfare //3
             else -> 0
         }
     }

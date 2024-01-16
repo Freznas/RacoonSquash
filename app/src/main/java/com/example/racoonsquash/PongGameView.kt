@@ -307,10 +307,10 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
 
-//    private fun checkWinCondition(): Boolean {
-//
-//        return blockList.isEmpty()
-//    }
+    private fun checkWinCondition(): Boolean {
+
+        return blockList.isEmpty()
+    }
 
     private fun resetBallPosition() {
         // Placera bollen på olika startpositioner beroende på var den åker ut
