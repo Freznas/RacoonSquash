@@ -13,7 +13,7 @@ class PaddlePong(
     val height: Float,
     color: Int
 ) {
-    private val paint: Paint = Paint().apply {
+    private var paint: Paint = Paint().apply {
         this.color = color
         style = Paint.Style.FILL
     }
@@ -46,6 +46,11 @@ class PaddlePong(
     }
 
     fun update() {
+
+    }
+
+    fun setPaddleTransparency(paddlePong: PaddlePong, alphaPaint: Int) {
+        paddlePong.paint.alpha = alphaPaint
 
     }
 

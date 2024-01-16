@@ -387,16 +387,15 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
     private fun updateScore(): Int {
         score++
+      
         if (score >= 5) {
+
             isGameWon = true
             soundEffect.play(9)
+            return score
+        }else{(score <= 0)
+            soundEffect.play(6)
         }
         return score
     }
 }
-
-//        if ()
-//        {
-//            ballSquash1.ballSpeedY *= -1
-//            ballSquash1.ballSpeedX= (10..30).random().toFloat()
-//        }

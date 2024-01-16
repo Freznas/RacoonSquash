@@ -316,11 +316,21 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
     }
 
+    private fun setTransparentPaddle(paddle: PaddlePong) {
+        when (lives) {
+            2 -> paddle.setPaddleTransparency(paddle, 80)
+            1 -> paddle.setPaddleTransparency(paddle, 40)
+            else -> paddle.setPaddleTransparency(paddle, 255)
+        }
+    }
+
 
     override fun run() {
         while (running) {
             if (!isPaused) {
                 update()
+                setTransparentPaddle(paddle)
+                setTransparentPaddle(topPaddle)
                 drawGameBounds(holder)
                 ballPong.checkBounds(bounds)
             }
@@ -520,15 +530,15 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
-                // Save score
-                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
-                sharedPreferencesManager.addNewScore(
-                    DataManager.Score(
-                        this.userName,
-                        score,
-                        DataManager.Game.BREAKOUT
-                    )
-                )
+//                // Save score
+//                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
+//                sharedPreferencesManager.addNewScore(
+//                    DataManager.Score(
+//                        this.userName,
+//                        score,
+//                        DataManager.Game.BREAKOUT
+//                    )
+//                )
             }
             canvas?.drawPath(it, lineColor)
             if (ballPong.ballPositionY < 0 - ballPong.ballSize) {
@@ -549,15 +559,24 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     0f + 100,
                     scorePaint
                 )
-            } //DENNA MÅSTE VARA KVAR:
-            if (lives <= 0)
+            }
+            if (lives <= 0) {
                 canvas?.drawText(
                     "GAME OVER",
                     canvas.width.toFloat() / 3,
                     canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
-
+                // Save score
+                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
+                sharedPreferencesManager.addNewScore(
+                    DataManager.Score(
+                        this.userName,
+                        score,
+                        DataManager.Game.BREAKOUT
+                    )
+                )
+            }
         }
 
         leftBoundaryPath?.let {
