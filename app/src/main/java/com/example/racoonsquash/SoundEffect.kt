@@ -3,6 +3,7 @@ package com.example.racoonsquash
 import android.content.Context
 import android.media.SoundPool
 
+// Changed soundeffect-class
 class SoundEffect(val context: Context) : Sound {
 
     // Soundpool-objekt med max antal ljud som kan spelas samtidigt
