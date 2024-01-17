@@ -29,7 +29,6 @@ class BallPong(
             R.drawable.custom_pongball_green,
             smallerSize
         )
-        soundEffect.loadSoundEffect(1)
 
     }
 
