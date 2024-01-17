@@ -62,12 +62,15 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     private val bounceSpeedXFactor = 10.0f  // Justera detta värde efter behov
 
+    private var soundEffectsList: MutableList<Int> = mutableListOf()
     val soundEffect = SoundEffect(context)
 
     init {
         if (mHolder != null) {
             mHolder?.addCallback(this)
         }
+
+        soundEffect.loadPongSoundEffects(soundEffectsList)
 
         lineColor = Paint().apply {
             color = Color.CYAN
@@ -154,25 +157,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
     }
 
-    fun restartGame() {
-        isGameReset = true
-        score = 0
-        lives = 3
-
-        setup()
-
-        if (isPaused) {
-            isPaused = false
-            pauseButton.isVisible = true
-        }
-
-        synchronized(blockList) {
-            // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
-            blockList.clear()
-            buildBreakoutBlocks()
-        }
-        start()
-    }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
@@ -195,10 +179,38 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         return true
     }
 
+    fun restartGame() {
+        stop()
+        soundEffect.stop()
+        soundEffect.releaseResource()
+        soundEffectsList.clear()
+
+        isGameReset = true
+        score = 0
+        lives = 3
+
+        setup()
+
+        if (isPaused) {
+            isPaused = false
+            pauseButton.isVisible = true
+        }
+
+        synchronized(blockList) {
+            // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
+            blockList.clear()
+            buildBreakoutBlocks()
+        }
+        start()
+    }
+
+
 
     fun start() {
-
         running = true
+        soundEffect.reBuild()
+        soundEffect.loadPongSoundEffects(soundEffectsList)
+
         thread = Thread(this) //en trad har en konstruktor som tar in en runnable,
         // vilket sker i denna klass se rad 10
         thread?.start()
@@ -220,10 +232,10 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private fun loseLife() {
         lives--
         if (lives <= 0) {
-            soundEffect.play(2)
+            soundEffect.play(soundEffectsList[2])
             isGameOver = true
         } else {
-            soundEffect.play(8)
+            soundEffect.play(soundEffectsList[5])
         }
     }
 
@@ -243,13 +255,13 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         // Check collision with the bottom paddle
         if (isBallCollidingWithPaddle(ballPong, paddle)) {
-            soundEffect.play(0)
+            soundEffect.play(soundEffectsList[0])
             handleBallPaddleCollision(ballPong, paddle)
         }
 
         // Check collision with the top paddle
         if (isBallCollidingWithPaddle(ballPong, topPaddle)) {
-            soundEffect.play(0)
+            soundEffect.play(soundEffectsList[0])
             handleBallPaddleCollision(ballPong, topPaddle)
         }
 
@@ -273,7 +285,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
         if (checkWinCondition() == true) {
             isGameWon = true
-            soundEffect.play(7)
+            soundEffect.play(soundEffectsList[4])
 
         }
 
@@ -292,12 +304,12 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         if (ballPong.ballPositionY < -ballPong.ballSize) {
             loseLife()
-            Thread.sleep(0)
+            //Thread.sleep(0)
             ballPong.ballPositionX = initialBallPosXForTop
             ballPong.ballPositionY = initialBallPosYForTop
         } else if (ballPong.ballPositionY > screenHeight - ballPong.ballSize) {
             loseLife()
-            Thread.sleep(0)
+            //Thread.sleep(0)
             ballPong.ballPositionX = initialBallPosXForBottom
             ballPong.ballPositionY = initialBallPosYForBottom
         }
@@ -407,7 +419,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
                     score++
 
-                    soundEffect.play(3)
+                    soundEffect.play(soundEffectsList[3])
 
                     isGameWon = deleteBlockInList(block)
 

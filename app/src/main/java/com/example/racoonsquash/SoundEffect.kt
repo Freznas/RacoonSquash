@@ -3,48 +3,69 @@ package com.example.racoonsquash
 import android.content.Context
 import android.media.SoundPool
 
-class SoundEffect (context: Context) : Sound {
+class SoundEffect(val context: Context) : Sound {
 
     // Soundpool-objekt med max antal ljud som kan spelas samtidigt
-    private val soundPool: SoundPool = SoundPool.Builder().setMaxStreams(20).build()
+    private var soundPool: SoundPool? = SoundPool.Builder().setMaxStreams(10).build()
 
-    private val bouncePaddleSound: Int = soundPool.load(context, R.raw.paddlebounce, 2)
-    private val wallBounceSound: Int = soundPool.load(context, R.raw.wallbounce, 2)
-    private val gameOverSound: Int = soundPool.load(context, R.raw.lose, 2)
-    private val upSound: Int = soundPool.load(context, R.raw.up, 2)
-    private val winSound: Int = soundPool.load(context, R.raw.win, 2)
-    private val lostLifeSound: Int = soundPool.load(context, R.raw.lost, 2)
-    private val squashBounceSound: Int = soundPool.load(context, R.raw.squashbounce, 2)
-    private val squashBouncySound: Int = soundPool.load(context, R.raw.squashbouncy, 1)
-    private val squashFailureSound: Int = soundPool.load(context, R.raw.squashfailure, 2)
-    private val squashSuccessSound: Int = soundPool.load(context, R.raw.squashsuccessfanfare, 2)
-
-    // Sätter id på varje ljud och beroende på id, spela upp ljudeffekt
     private var audioID: Int = 0
 
     override fun play(id: Int) {
-
         this.audioID = id
-
-        when(id) {
-            0 -> soundPool.play(bouncePaddleSound, 1.0f, 1.0f, 2, 0, 1.0f)
-            1 -> soundPool.play(wallBounceSound, 1.0f, 1.0f, 2, 0, 1.0f)
-            2 -> soundPool.play(gameOverSound, 1.0f, 1.0f, 3, 0, 1.0f)
-            3 -> soundPool.play(upSound, 1.0f, 1.0f, 2, 0, 1.0f)
-            4 -> soundPool.play(squashBounceSound, 1.0f, 1.0f, 2, 0, 1.0f)
-            5 -> soundPool.play(squashBouncySound, 1.0f, 1.0f, 2, 0, 1.0f)
-            6 -> soundPool.play(squashFailureSound, 1.0f, 1.0f, 3, 0, 1.0f)
-            7 -> soundPool.play(winSound, 1.0f, 1.0f, 3, 0, 1.0f)
-            8 -> soundPool.play(lostLifeSound, 1.0f, 1.0f, 2, 0, 1.0f)
-            9 -> soundPool.play(squashSuccessSound, 1.0f, 1.0f, 3, 0, 1.0f)
-        }
+        soundPool?.play(audioID, 1.0f, 1.0f, 2, 0, 1.0f)
     }
 
     override fun releaseResource() {
-        soundPool.release()
+        soundPool?.release()
+        soundPool = null
     }
 
     override fun stop() {
-        soundPool.stop(audioID)
+        soundPool?.stop(audioID)
+    }
+
+    fun reBuild() {
+        if (soundPool == null) {
+            soundPool = SoundPool.Builder().setMaxStreams(10).build()
+        }
+    }
+
+    private fun getResource(resource: Int): Int {
+        return when (resource) {
+            0 -> R.raw.paddlebounce
+            1 -> R.raw.wallbounce
+            2 -> R.raw.lose
+            3 -> R.raw.up
+            4 -> R.raw.win
+            5 -> R.raw.lost
+            6 -> R.raw.squashbounce
+            7 -> R.raw.squashbouncy
+            8 -> R.raw.squashfailure
+            9 -> R.raw.squashsuccessfanfare
+            else -> 0
+        }
+    }
+
+    fun loadPongSoundEffects(pongSoundList: MutableList<Int>) {
+        for (i in 0..5) {
+            val load = soundPool?.load(context, getResource(i), 1)
+            if (load != null) {
+                pongSoundList.add(load)
+            }
+        }
+    }
+
+    fun loadSquashSoundEffects(squashSoundList: MutableList<Int>) {
+        for (i in 6..9) {
+            val load = soundPool?.load(context, getResource(i), 1)
+            if (load != null) {
+                squashSoundList.add(load)
+            }
+        }
+    }
+
+    fun loadSoundEffect(load: Int) {
+        soundPool?.load(context, getResource(load), 1)
     }
 }
+
