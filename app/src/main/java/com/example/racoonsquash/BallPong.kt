@@ -20,7 +20,8 @@ class BallPong(
     private val soundEffect: SoundEffect = SoundEffect(context)
 
     init {
-
+        
+        soundEffect.loadSoundEffect(1)
         val smallerSize = BitmapFactory.Options()
         smallerSize.inSampleSize = 14
 
