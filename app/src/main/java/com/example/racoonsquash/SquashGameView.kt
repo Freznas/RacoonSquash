@@ -34,6 +34,8 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     var bounds = Rect() //for att kunna studsa m vaggarna
     var mHolder: SurfaceHolder? = holder
 
+    private var gameOver = false
+
     private var buttonPauseRect: Rect? = null
     private val buttonPausePaint = Paint().apply {
         //This could be transparent if no rectangle is wanted to be shown
@@ -106,6 +108,16 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         )
     }
 
+    private fun checkGameOver(): Boolean {
+        return if (ballSquash.ballPositionX < 0 - ballSquash.ballSize) {
+            soundEffect.play(soundEffectsList[2])
+            gameOver = true
+            true
+        } else {
+            false
+        }
+    }
+
     fun start() {
         running = true
         thread =
@@ -118,7 +130,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     fun stop() {
         running = false
         try {
-            thread?.join() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
+            thread?.interrupt() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
@@ -167,9 +179,10 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
                 buttonPauseText = if (isPaused) context.getString(R.string.pauseText)
                 else context.getString(R.string.resumeText)
                 isPaused = !isPaused
-                drawGameBounds(holder)
+               // drawGameBounds(holder) // causing bug when thread is stopped
             } else if (isInsideRestartRectangle(x, y) && event.action == MotionEvent.ACTION_DOWN) {
                 // User is clicking on Restart
+                isPaused = false
                 restartGame()
             } else {
                 // User is not clicking on pause or restart - handle other touch events
@@ -188,6 +201,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
     }
 
     private fun restartGame() {
+        stop() // interrupt current thread
         score = 0
         isGameWon = false
         isPaused = false
@@ -201,6 +215,8 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         buttonPauseText = context.getString(R.string.pauseText)
 
         drawGameBounds(holder)
+
+        start() // start new thread
     }
 
     //onBallCollision inverterar riktningen på bollen när den träffar squashPad
@@ -371,6 +387,10 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         }
 
         holder.unlockCanvasAndPost(canvas)
+
+        if (checkGameOver()) {
+            stop()
+        }
     }
 
 
@@ -390,7 +410,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
 
     private fun updateScore(): Int {
         score++
-        if (score >= 3) {
+        if (score >= 15) {
             isGameWon = true
             // TODO 5 av 5   soundEffect.play(soundEffectsList[3])
             return score
