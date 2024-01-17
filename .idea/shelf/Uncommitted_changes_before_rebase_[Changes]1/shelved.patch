@@ -1,0 +1,3 @@
+diff --git a/app/src/main/java/com/example/racoonsquash/MyApp.kt b/app/src/main/java/com/example/racoonsquash/SharedPreferences.kt
+rename from app/src/main/java/com/example/racoonsquash/MyApp.kt
+rename to app/src/main/java/com/example/racoonsquash/SharedPreferences.kt
