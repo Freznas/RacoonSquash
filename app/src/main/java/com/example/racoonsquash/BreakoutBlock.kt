@@ -4,23 +4,19 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.util.Log
 
 class BreakoutBlock(
     context: Context,
-    var posX: Float, // Left position
-    var posY: Float, // Top position
-    var width: Float, // Right position
-    var height: Float, // Bottom position
+    val posX: Float, // Left position
+    val posY: Float, // Top position
+    val width: Float, // Right position
+    val height: Float, // Bottom position
     private val bitmapNumber: Int
-
 ) {
-    var isDestroyed: Boolean = false
 
     private val bitmap: List<Bitmap>
 
     init {
-        Log.d("BreakoutBlock", "posX: $posX, posY: $posY, width: $width, height: $height")
 
         bitmap = listOf(
             BitmapFactory.decodeResource(context.resources, R.drawable.block_pink),
