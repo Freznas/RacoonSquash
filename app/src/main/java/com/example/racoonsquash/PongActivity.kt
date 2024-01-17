@@ -13,18 +13,16 @@ class PongActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPongBinding
     private lateinit var gameView: PongGameView
+    private lateinit var mediaPlayer: MediaPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPongBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val mediaPlayer: MediaPlayer= MediaPlayer.create(this, R.raw.pongbreakout3)
+       mediaPlayer= MediaPlayer.create(this, R.raw.pongbreakout3)
 
         mediaPlayer.start()
-        mediaPlayer.setOnErrorListener { mp, what, extra ->
-            Log.e("MediaPlayer", "Error: $what, Extra: $extra")
-            false
-        }
-        mediaPlayer.isLooping=true
+
+        mediaPlayer.isLooping = true
 
         gameView = PongGameView(this, intent.getStringExtra("userName")!!)
 
@@ -42,27 +40,37 @@ class PongActivity : AppCompatActivity() {
         gameView.setupButtons(pauseButton, playButton)
 
         restartButton.setOnClickListener {
+
             restartActivity()
         }
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mediaPlayer.isPlaying)
+            mediaPlayer.start()
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
         gameView.stop()
         gameView.soundEffect.releaseResource()
-
     }
 
     override fun onPause() {
         super.onPause()
-        gameView.stop()
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause()
+        }
+        gameView.thread?.interrupt()
         gameView.soundEffect.releaseResource()
 
     }
 
     private fun restartActivity() {
         gameView.restartGame()
-    }
 
+    }
 }
