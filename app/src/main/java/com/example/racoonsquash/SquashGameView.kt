@@ -143,13 +143,13 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         // Räknar bara när boll rör långsidan just nu
         if (ballSquash.ballPositionX > width - ballSquash.ballSize) {
             updateScore()
-            // TODO 1 av 5   soundEffect.play(soundEffectsList[0]) //ljudeffekt när boll rör långsidan
+            soundEffect.play(soundEffectsList[0]) //ljudeffekt när boll rör långsidan
         }
         if (ballSquash.ballPositionY > height - ballSquash.ballSize) {
-            // TODO 2 av 5   soundEffect.play(soundEffectsList[0]) //ljudeffekt när boll rör golvet
+            soundEffect.play(soundEffectsList[0]) //ljudeffekt när boll rör golvet
         }
         if (ballSquash.ballPositionY < 0 + ballSquash.ballSize) {
-            // TODO 3 av 5   soundEffect.play(soundEffectsList[0]) //ljudeffekt när boll rör golvet
+            soundEffect.play(soundEffectsList[0]) //ljudeffekt när boll rör golvet
         }
     }
 
@@ -256,7 +256,7 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
             padBottom
         ) {
             onBallCollision(ballSquash1, squashPad)
-            // TODO 4 av 5   soundEffect.play(soundEffectsList[1]) //ljudeffekt när boll rör pad
+            soundEffect.play(soundEffectsList[1]) //ljudeffekt när boll rör pad
         }
     }
 
@@ -412,10 +412,11 @@ class SquashGameView(context: Context, private val userName: String) : SurfaceVi
         score++
         if (score >= 15) {
             isGameWon = true
-            // TODO 5 av 5   soundEffect.play(soundEffectsList[3])
+            soundEffect.play(soundEffectsList[3])
             return score
-        }else{(score <= 0)
-            //soundEffect.play(soundEffectsList[2])
+        }
+        if(isGameOver() == true) {
+            soundEffect.play(soundEffectsList[2])
         }
         return score
     }
