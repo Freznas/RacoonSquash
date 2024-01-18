@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.racoonsquash.databinding.ActivityMainBinding
 
-//RacoonGames
+//RacoonStudio
 // Medlemmar:Jörgen Hård (ProductOwner), Joakim Bjärkstedt (scrum-Master) Elin Andersson(utvecklare) Denise Cigel (Utvecklare)
 class MainActivity : AppCompatActivity() {
     private lateinit var listAdapter: TopScoreExpandableListAdapter
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadTopScores() {
-        //get all the games as a list of Strings
+        //Hämta samtliga spel som en lista av strängar
         gameList = DataManager.Game.values().map { game -> game.name }.toMutableList()
 
         topScorePerGame = HashMap()

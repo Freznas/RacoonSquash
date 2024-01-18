@@ -23,7 +23,7 @@ class SquashActivity : AppCompatActivity() {
 
         // Skapa en MediaPlayer-instans för att spela din MP3-fil
         mediaPlayer = MediaPlayer.create(this, R.raw.squashbackgroundmusic)
-        mediaPlayer?.isLooping = true // Sätt till true om du vill att musiken ska loopa
+        mediaPlayer?.isLooping = true
     }
 
     override fun onResume() {

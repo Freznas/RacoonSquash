@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Rect
-
+// Ärver från ball super-klassen
 class BallPong(
     context: Context,
     ballPositionX: Float,
@@ -34,7 +34,7 @@ class BallPong(
     }
 
     override fun checkBounds(bounds: Rect) {
-        // Kolla vänster och höger vägg
+// Kolla vänster och höger vägg
         if (ballPositionX - ballSize < bounds.left || ballPositionX + ballSize > bounds.right) {
             soundEffect.play(1)
             ballSpeedX *= -1
