@@ -21,5 +21,10 @@
     <dimen name="sv_margin_top">70dp</dimen>
     <dimen name="btn_play_pause_margin_top">20dp</dimen>
     <dimen name="btn_play_pause_margin_end">40dp</dimen>
+    <dimen name="margin_end_btn">70dp</dimen>
+    <dimen name="image_btn_padding_horizon">40dp</dimen>
+    <dimen name="margin_end_btn_m">40dp</dimen>
+    <dimen name="lin_lay_pad_xs">8dp</dimen>
+    <dimen name="lin_lay_s">16dp</dimen>
 
 </resources>
