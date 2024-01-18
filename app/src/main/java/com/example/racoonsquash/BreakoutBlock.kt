@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-
+// mall för blocken
 class BreakoutBlock(
     context: Context,
     val posX: Float, // Left position

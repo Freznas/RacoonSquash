@@ -4,7 +4,7 @@ import com.example.racoonsquash.DataManager.Game
 import com.example.racoonsquash.DataManager.Game.BREAKOUT
 import com.example.racoonsquash.DataManager.Game.SQUASH
 import com.example.racoonsquash.DataManager.Score
-
+// används inte men vill visa hur vi gjorde från början.
 class InMemoryDataManager : DataManager {
 
     private val scores: MutableList<Score> = mutableListOf(

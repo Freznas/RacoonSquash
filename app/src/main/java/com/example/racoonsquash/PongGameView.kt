@@ -24,30 +24,20 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     var lineColor: Paint
     private var leftBoundaryPath: Path? = null
     private var rightBoundaryPath: Path? = null
-    var touchColor: Paint
+    var lineColorGameOver: Paint
     var scorePaint: Paint
-
     var isGameOver = false
     var isGameWon = false
-
     var isGameReset = false
-
     var textGameWonPaint: Paint
     private var textGameOverPaint: Paint
-
-    //    private var scorePlayerTop = 0
-//    private var scorePlayerBottom = 0
     private val blockList: MutableList<BreakoutBlock> = mutableListOf()
     private val xPositionList: MutableList<Float> = mutableListOf()
     private val yPositionList: MutableList<Float> = mutableListOf()
     lateinit var ballPong: BallPong
     var bounds = Rect()
     var mHolder: SurfaceHolder? = holder
-
     private lateinit var pauseButton: ImageButton
-//    private val initialBallPosX = 500f
-//    private val initialBallPosY = 700f
-
     private var score = 0
     private lateinit var paddle: PaddlePong
     private lateinit var topPaddle: PaddlePong
@@ -55,13 +45,9 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     private val initialBallPosYForTop = 1300f
     private val initialBallPosXForBottom = 300f
     private val initialBallPosYForBottom = 500f
-    private var lives = 3// Antal liv
-
-
+    private var lives = 3
     private var isPaused = false
-
-    private val bounceSpeedXFactor = 10.0f  // Justera detta värde efter behov
-
+    private val bounceSpeedXFactor = 10.0f //Kontrollerar vinkel på studs vid kollision med padel
     private var soundEffectsList: MutableList<Int> = mutableListOf()
     val soundEffect = SoundEffect(context)
 
@@ -71,7 +57,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
 
         soundEffect.loadPongSoundEffects(soundEffectsList)
-
+//Ritar upp texter med färg och typsnitt
         lineColor = Paint().apply {
             color = Color.CYAN
             style = Paint.Style.STROKE
@@ -96,13 +82,14 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                 typeface = Typeface.create("serif-monospace", Typeface.BOLD)
             }
 
-            // Enbart för att synliggöra gränserna
+// Enbart för att synliggöra gränserna
             lineColor = Paint().apply {
                 color = Color.MAGENTA
                 style = Paint.Style.STROKE
                 strokeWidth = 10f
             }
-            touchColor = Paint().apply {
+
+            lineColorGameOver = Paint().apply {
                 color = Color.RED
                 style = Paint.Style.STROKE
                 strokeWidth = 50f
@@ -122,7 +109,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         paddle = PaddlePong(
             context,
             screenWidth / 2f,
-            screenHeight - 300f,  // for bottom paddle (Had to change for the smaller size) // JH
+            screenHeight - 300f,
             180f,
             20f,
             Color.parseColor("#FFFF00")
@@ -140,6 +127,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
 
     fun setupButtons(pauseButton: ImageButton, playButton: ImageButton) {
+//hanterar bytet av play & pause knapp baserat på klickläge
         pauseButton.setOnClickListener {
             this.pauseButton = pauseButton
             if (!isGameWon && lives > 0) {
@@ -160,8 +148,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
+//Styr båda paddlarna samtidigt med fingret
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-                // Move both paddles in sync based on the touch input
                 val newX = event.x
                 paddle.move(newX)
                 topPaddle.move(newX)
@@ -172,10 +160,9 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         return true
     }
 
+    //Hanterar kontrol av paddlar (se onTouchEvent ↑)
     override fun performClick(): Boolean {
-        // Call the super implementation to handle the click event
         super.performClick()
-        // Return true if the click event is handled
         return true
     }
 
@@ -185,6 +172,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         soundEffect.releaseResource()
         soundEffectsList.clear()
 
+//Vid omstart ställer om poäng & liv till rätt värden
         isGameReset = true
         score = 0
         lives = 3
@@ -197,7 +185,6 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
 
         synchronized(blockList) {
-            // Tömma listan kan orsaka bug? Annat sätt att lösa det på?
             blockList.clear()
             buildBreakoutBlocks()
         }
@@ -205,14 +192,13 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
 
-
     fun start() {
         running = true
         soundEffect.reBuild()
         soundEffect.loadPongSoundEffects(soundEffectsList)
 
-        thread = Thread(this) //en trad har en konstruktor som tar in en runnable,
-        // vilket sker i denna klass se rad 10
+        thread = Thread(this)
+
         thread?.start()
 
     }
@@ -222,7 +208,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
 
         try {
-            thread?.interrupt() //join betyder att huvudtraden komemr vanta in att traden dor ut av sig sjalv
+            thread?.interrupt() //join betyder att huvudtraden komemr vanta in att tråden dor ut av sig sjalv
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
@@ -252,33 +238,27 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
             stop()
         }
 
-
-        // Check collision with the bottom paddle
+//Kontrollera kollision med botten padeln
         if (isBallCollidingWithPaddle(ballPong, paddle)) {
             soundEffect.play(soundEffectsList[0])
             handleBallPaddleCollision(ballPong, paddle)
         }
 
-        // Check collision with the top paddle
+//Kontrollera kollision med top padeln
         if (isBallCollidingWithPaddle(ballPong, topPaddle)) {
             soundEffect.play(soundEffectsList[0])
             handleBallPaddleCollision(ballPong, topPaddle)
         }
 
-
         if (ballPong.ballPositionY < -ballPong.ballSize) {
-
 
             resetBallPosition()
 
         } else if (ballPong.ballPositionY > screenHeight + ballPong.ballSize) {
 
-
             resetBallPosition()
 
-
         } else if (ballPong.ballPositionX < 0) {
-
 
             score = 0
 
@@ -300,16 +280,14 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
     private fun resetBallPosition() {
-        // Placera bollen på olika startpositioner beroende på var den åker ut
+// Placera bollen på olika startpositioner beroende på var den åker ut och ta bort ett liv
 
         if (ballPong.ballPositionY < -ballPong.ballSize) {
             loseLife()
-            //Thread.sleep(0)
             ballPong.ballPositionX = initialBallPosXForTop
             ballPong.ballPositionY = initialBallPosYForTop
         } else if (ballPong.ballPositionY > screenHeight - ballPong.ballSize) {
             loseLife()
-            //Thread.sleep(0)
             ballPong.ballPositionX = initialBallPosXForBottom
             ballPong.ballPositionY = initialBallPosYForBottom
         }
@@ -323,34 +301,33 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         }
     }
 
-
     override fun run() {
         while (running) {
             if (!isPaused) {
                 update()
                 setTransparentPaddle(paddle)
                 setTransparentPaddle(topPaddle)
-                drawGameBounds(holder)
+                drawGamePong(holder)
                 ballPong.checkBounds(bounds)
             }
         }
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
+//Hanterar positioner för BreakoutBlock
         val blockWidth = 175f
         val blockHeight = 50f
         val centerX = (width / 2) - (blockWidth / 2)
         val centerY = (height / 2) - (blockHeight / 2)
         setup()
-
-        // Column positions
+// Kolumn positioner
         columnBlockPosition(centerX - 400f)
         columnBlockPosition(centerX - 200f)
         columnBlockPosition(centerX)
         columnBlockPosition(centerX + 200f)
         columnBlockPosition(centerX + 400f)
 
-        // Row positions
+// Rad positioner
         rowBlockPosition(centerY - 140f)
         rowBlockPosition(centerY - 70f)
         rowBlockPosition(centerY)
@@ -392,7 +369,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
 
-    // Adding blocks in list in rows and columns
+
+//Lägger till block i listan i rader och kolumner
     private fun buildBreakoutBlocks() {
         var randomBitmap = Random.nextInt(0, 3)
         val blockWidth = 175f
@@ -466,7 +444,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
     }
 
-    fun drawGameBounds(holder: SurfaceHolder) {
+    fun drawGamePong(holder: SurfaceHolder) {
         val canvas: Canvas? = holder.lockCanvas()
 
         canvas?.drawColor(Color.BLACK)
@@ -482,7 +460,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     canvas.height.toFloat() - 300,
                     textGameWonPaint
                 )
-                // Save score
+// Spara poäng vid vinst
                 val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
                 sharedPreferencesManager.addNewScore(
                     DataManager.Score(
@@ -491,7 +469,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                         DataManager.Game.BREAKOUT
                     )
                 )
-//                    stop()
+
             }
 
             if (isGameOver && isGameReset) {
@@ -501,19 +479,11 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
-//                // Save score
-//                val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
-//                sharedPreferencesManager.addNewScore(
-//                    DataManager.Score(
-//                        this.userName,
-//                        score,
-//                        DataManager.Game.BREAKOUT
-//                    )
-//                )
+
             }
             canvas?.drawPath(it, lineColor)
             if (ballPong.ballPositionY < 0 - ballPong.ballSize) {
-                canvas?.drawPath(it, touchColor)
+                canvas?.drawPath(it, lineColorGameOver)
                 canvas?.drawText(
                     "Score: $score",
                     canvas.width.toFloat() - 400,
@@ -523,7 +493,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
 
             } else {
-                // Placera text
+// Placera text
                 canvas?.drawText(
                     "Score: $score",
                     canvas.width.toFloat() - 400,
@@ -538,7 +508,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
                     canvas.height.toFloat() - 300,
                     textGameOverPaint
                 )
-                // Save score
+
+//Spara poäng vid gameover
                 val sharedPreferencesManager: DataManager = SharedPreferencesManager(context)
                 sharedPreferencesManager.addNewScore(
                     DataManager.Score(
@@ -554,7 +525,8 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
             canvas?.drawPath(it, lineColor)
         }
 
-        // Draw the paddles
+
+//Rita upp padlarna
         paddle.draw(canvas!!)
         topPaddle.draw(canvas)
 
@@ -575,12 +547,13 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
     private fun isBallCollidingWithPaddle(ball: BallPong, paddle: PaddlePong): Boolean {
-        // Check if the ball is within the horizontal bounds of the paddle
+//Kontrolle om bollen är inom horizontella gränserna av padeln
         val horizontalCollision =
             ball.ballPositionX + ball.ballSize > paddle.padPositionX - paddle.width / 2 &&
                     ball.ballPositionX - ball.ballSize < paddle.padPositionX + paddle.width / 2
 
-        // Check if the ball is within the vertical bounds of the paddle
+//Kontrolle om bollen är inom vertikala gränserna av padeln
+
         val verticalCollision =
             ball.ballPositionY + ball.ballSize > paddle.padPositionY - paddle.height / 2 &&
                     ball.ballPositionY - ball.ballSize < paddle.padPositionY + paddle.height / 2
@@ -589,16 +562,16 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
     }
 
     private fun handleBallPaddleCollision(ball: BallPong, paddle: PaddlePong) {
-        // Invertera Y-hastigheten för att bollen ska studsa
+// Invertera Y-hastigheten för att bollen ska studsa
         ball.ballSpeedY = -ball.ballSpeedY
 
-        // Justera X-hastigheten baserat på träffpunkten på paddeln
+// Justera X-hastigheten baserat på träffpunkten på paddeln
         val impactPoint = (ball.ballPositionX - paddle.padPositionX) / (paddle.width / 2)
 
         ball.ballSpeedX = bounceSpeedXFactor * impactPoint
     }
 
-    //     Enbart spelplan med linje för syns skull, vänster sidolinje.
+//Enbart spelplan med linje för syns skull, vänster sidolinje.
     private fun createBoundaryPathLeft(width: Int, height: Int): Path {
         val pathLeft = Path()
 
@@ -608,7 +581,7 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
         return pathLeft
     }
 
-    // Enbart spelplan med linje för syns skull, höger sidolinje.
+//Enbart spelplan med linje för syns skull, höger sidolinje.
     private fun createBoundaryPathRight(width: Int, height: Int): Path {
         val pathRight = Path()
 
@@ -617,17 +590,5 @@ class PongGameView(context: Context, private val userName: String) : SurfaceView
 
         return pathRight
     }
-//    private fun updateScore(): Int {
-//        score++
-//        return score
-//    }
-//    private fun updateScoreTop(): Int {
-//        scorePlayerTop++
-//        return scorePlayerTop
-//    }
-//
-//    private fun updateScoreBottom(): Int {
-//        scorePlayerBottom++
-//        return scorePlayerBottom
-//    }
+
 }

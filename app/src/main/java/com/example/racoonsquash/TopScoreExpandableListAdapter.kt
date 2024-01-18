@@ -36,14 +36,9 @@ class TopScoreExpandableListAdapter(
             val inflater = LayoutInflater.from(context)
             convertView = inflater.inflate(R.layout.list_item, parent, false)
         }
-        // Sort the scores in descending order directly when fetching them
+//Sortera poängen i fallande ordning direkt när dem hämtas
         val sortedScores = scores?.sortedByDescending { it.score }
 
-//        if (convertView == null) {
-//            val infalInflater = this.context
-//                .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-//            convertView = infalInflater.inflate(R.layout.list_item, null)
-//        }
         if (sortedScores != null && childPosition < sortedScores.size) {
             val score = sortedScores[childPosition]
             val scoreListItemTextView = convertView!!.findViewById<TextView>(R.id.scoreListItem)
@@ -97,5 +92,3 @@ class TopScoreExpandableListAdapter(
         return true
     }
 }
-// val unsortedList = listOf(scoresPerGame)
-//        val gameList = unsortedList.sortedBy { it.scoreListItem}

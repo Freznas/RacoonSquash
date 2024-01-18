@@ -7,7 +7,7 @@ interface DataManager {
     fun getAllScores(): List<Score>
 
     /**
-     * Returns all the scores for the given Game
+     * Returnerar poäng från valt spel
      */
     fun getAllScores(game: Game): List<Score>
 
