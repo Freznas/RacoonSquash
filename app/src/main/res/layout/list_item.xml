@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/tv_list_item_name"
-        android:layout_weight="1"
+        android:layout_weight="@dimen/lay_weight_xs"
         android:padding="@dimen/tv_list_item_padding"
         android:textSize="@dimen/tv_list_item_textsize"
         android:textStyle="bold"/>
@@ -22,5 +22,5 @@
         android:text="@string/tv_list_item_score"
         android:padding="@dimen/tv_list_item_padding"
         android:textSize="@dimen/tv_list_item_textsize"
-        android:layout_weight="1"/>
+        android:layout_weight="@dimen/lay_weight_xs"/>
 </LinearLayout>
