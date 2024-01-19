@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="@dimen/lin_lay_pad_xs"
-    android:background="#CCCCCC">
+    android:background="@color/light_gray">
 
     <TextView
         android:id="@+id/gameListHeader"

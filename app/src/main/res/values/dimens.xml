@@ -26,5 +26,11 @@
     <dimen name="margin_end_btn_m">40dp</dimen>
     <dimen name="lin_lay_pad_xs">8dp</dimen>
     <dimen name="lin_lay_s">16dp</dimen>
+    <dimen name="lay_mar_zero">0dp</dimen>
+    <dimen name="lay_height_m">70dp</dimen>
+    <dimen name="fram_lay_height_xs">0dp</dimen>
+    <dimen name="lay_weight_xs">1</dimen>
+    <dimen name="scaleX">2</dimen>
+    <dimen name="scaleY">2</dimen>
 
 </resources>
